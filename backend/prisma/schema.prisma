@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id                   Int                  @id @default(autoincrement())
+  studentNumber        String?              // Öğrenci No (OCR için)
+  fullName             String
+  isActive             Boolean              @default(true) // Soft delete için
+  createdAt            DateTime             @default(now())
+  
+  // İlişkiler
+  currentBooks         Book[]               @relation("CurrentHolder")
+  readingHistory       ReadingHistory[]
+  attendanceSnapshots  AttendanceSnapshot[]
+  distributionsFrom    DistributionItem[]   @relation("FromStudent")
+  distributionsTo      DistributionItem[]   @relation("ToStudent")
+}
+
+model Book {
+  id                     Int                @id @default(autoincrement())
+  labelNumber            String             // "1", "2", "3A" gibi olabilmesi için String
+  title                  String?            // Kitabın adı
+  author                 String?            // Yazar
+  isbn                   String?            // ISBN numarası
+  coverImage             String?            // Kitap kapak URL'si
+  isActive               Boolean            @default(true) // Soft delete için
+  createdAt              DateTime           @default(now())
+  
+  // İlişkiler
+  currentHolderStudentId Int?
+  currentHolder          Student?           @relation("CurrentHolder", fields: [currentHolderStudentId], references: [id])
+  readingHistory         ReadingHistory[]
+  distributionItems      DistributionItem[]
+}
+
+model Distribution {
+  id            Int                  @id @default(autoincrement())
+  distributedAt DateTime             @default(now())
+  note          String?
+  createdBy     String?              // "Admin" vb.
+  
+  // İlişkiler
+  items         DistributionItem[]
+  attendance    AttendanceSnapshot[]
+  history       ReadingHistory[]
+}
+
+model DistributionItem {
+  id             Int          @id @default(autoincrement())
+  
+  distributionId Int
+  distribution   Distribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  
+  bookId         Int
+  book           Book         @relation(fields: [bookId], references: [id])
+  
+  fromStudentId  Int?         // Kitap kimden geldi (Yeni kitapsa null olabilir)
+  fromStudent    Student?     @relation("FromStudent", fields: [fromStudentId], references: [id])
+  
+  toStudentId    Int          // Kitap kime gitti
+  toStudent      Student      @relation("ToStudent", fields: [toStudentId], references: [id])
+}
+
+model AttendanceSnapshot {
+  id             Int          @id @default(autoincrement())
+  
+  distributionId Int
+  distribution   Distribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  
+  studentId      Int
+  student        Student      @relation(fields: [studentId], references: [id])
+  
+  status         String       // "PRESENT", "ABSENT", "NO_BOOK" (Sınıfta ama kitabı yok)
+}
+
+model ReadingHistory {
+  id             Int          @id @default(autoincrement())
+  
+  studentId      Int
+  student        Student      @relation(fields: [studentId], references: [id])
+  
+  bookId         Int
+  book           Book         @relation(fields: [bookId], references: [id])
+  
+  distributionId Int?         // Hangi dağıtımda okudu (Manuel eklenmişse null olabilir)
+  distribution   Distribution? @relation(fields: [distributionId], references: [id], onDelete: SetNull)
+  
+  readAt         DateTime     @default(now())
+}
