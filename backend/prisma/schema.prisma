@@ -20,6 +20,7 @@ model Student {
   
   // İlişkiler
   currentBooks         Book[]               @relation("CurrentHolder")
+  lostBooks            Book[]               @relation("LostBy")
   readingHistory       ReadingHistory[]
   attendanceSnapshots  AttendanceSnapshot[]
   distributionsFrom    DistributionItem[]   @relation("FromStudent")
@@ -39,6 +40,12 @@ model Book {
   // İlişkiler
   currentHolderStudentId Int?
   currentHolder          Student?           @relation("CurrentHolder", fields: [currentHolderStudentId], references: [id])
+  
+  // Kayıp Bilgisi
+  lostByStudentId        Int?
+  lostBy                 Student?           @relation("LostBy", fields: [lostByStudentId], references: [id])
+  lostAt                 DateTime?
+
   readingHistory         ReadingHistory[]
   distributionItems      DistributionItem[]
 }

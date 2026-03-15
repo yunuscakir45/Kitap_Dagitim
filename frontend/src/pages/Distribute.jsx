@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { studentApi, distributionApi } from '../api';
-import { Users, AlertCircle, ArrowRight, CheckCircle2, UserX, BookX } from 'lucide-react';
+import { Users, AlertCircle, ArrowRight, CheckCircle2, UserX, BookX, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Distribute = () => {
     const [students, setStudents] = useState([]);
-    const [attendance, setAttendance] = useState({}); // { studentId: 'PRESENT' | 'ABSENT' | 'NO_BOOK' }
+    const [attendance, setAttendance] = useState({}); // { studentId: 'PRESENT' | 'ABSENT' | 'NO_BOOK' | 'LOST_BOOK' }
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -86,8 +86,9 @@ const Distribute = () => {
 
                     <div className="space-y-3">
                         {Object.keys(successResult.matches).map((studentIdStr, index) => {
-                            const bookIdStr = successResult.matches[studentIdStr];
+                            const bookId = successResult.matches[studentIdStr];
                             const student = students.find(s => s.id === parseInt(studentIdStr));
+                            const book = student?.currentBooks?.find(b => b.id === bookId) || { labelNumber: bookId };
 
                             return (
                                 <div key={studentIdStr} className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-[color:var(--border)]">
@@ -96,7 +97,7 @@ const Distribute = () => {
                                         <div className="font-medium text-slate-800 dark:text-slate-200">{student?.fullName || 'Bilinmeyen'}</div>
                                     </div>
                                     <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md">
-                                        <ArrowRight size={16} /> Kitap ID: {bookIdStr}
+                                        <ArrowRight size={16} /> Kitap No: {book.labelNumber}
                                     </div>
                                 </div>
                             );
@@ -136,10 +137,11 @@ const Distribute = () => {
                     <h3 className="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                         <Users size={18} className="text-indigo-500" /> Sınıf Yoklaması
                     </h3>
-                    <div className="flex gap-2 text-xs">
+                    <div className="flex flex-wrap gap-2 text-xs">
                         <span className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-1 rounded"><CheckCircle2 size={12} /> Mevcut</span>
                         <span className="flex items-center gap-1 bg-red-100 text-red-700 px-2 py-1 rounded"><UserX size={12} /> Yok</span>
                         <span className="flex items-center gap-1 bg-amber-100 text-amber-700 px-2 py-1 rounded"><BookX size={12} /> Kitapsız</span>
+                        <span className="flex items-center gap-1 bg-slate-200 text-slate-700 px-2 py-1 rounded"><Trash2 size={12} /> Kitabı Kaybetti</span>
                     </div>
                 </div>
 
@@ -159,27 +161,36 @@ const Distribute = () => {
                                         )}
                                     </div>
 
-                                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 self-start md:self-auto">
+                                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 self-start md:self-auto overflow-x-auto">
                                         <button
                                             type="button"
                                             onClick={() => handleStatusChange(student.id, 'PRESENT')}
-                                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${attendance[student.id] === 'PRESENT' ? 'bg-white dark:bg-slate-700 text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-emerald-500'}`}
+                                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap ${attendance[student.id] === 'PRESENT' ? 'bg-white dark:bg-slate-700 text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-emerald-500'}`}
                                         >
                                             Geldi
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => handleStatusChange(student.id, 'ABSENT')}
-                                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${attendance[student.id] === 'ABSENT' ? 'bg-white dark:bg-slate-700 text-red-600 shadow-sm' : 'text-slate-500 hover:text-red-500'}`}
+                                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap ${attendance[student.id] === 'ABSENT' ? 'bg-white dark:bg-slate-700 text-red-600 shadow-sm' : 'text-slate-500 hover:text-red-500'}`}
                                         >
                                             Yok
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => handleStatusChange(student.id, 'NO_BOOK')}
-                                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${attendance[student.id] === 'NO_BOOK' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-500 hover:text-amber-500'}`}
+                                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap ${attendance[student.id] === 'NO_BOOK' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-500 hover:text-amber-500'}`}
                                         >
                                             Kitapsız
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={!student.currentBooks || student.currentBooks.length === 0}
+                                            onClick={() => handleStatusChange(student.id, 'LOST_BOOK')}
+                                            className={`px-3 py-1.5 text-xs md:text-sm font-medium rounded-md transition-all whitespace-nowrap disabled:opacity-30 disabled:cursor-not-allowed ${attendance[student.id] === 'LOST_BOOK' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
+                                            title={(!student.currentBooks || student.currentBooks.length === 0) ? "Öğrencinin zaten kitabı yok" : "Kitabı kaybettiğini işaretle"}
+                                        >
+                                            Kaybetti
                                         </button>
                                     </div>
                                 </div>
