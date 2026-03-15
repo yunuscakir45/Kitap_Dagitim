@@ -15,7 +15,7 @@ services:
         value: 5000
 
   # Frontend UI
-  - type: static
+  - type: static_site
     name: kitap-dagitim-ui
     env: static
     plan: free
@@ -25,7 +25,7 @@ services:
     publishDir: dist
     envVars:
       - key: VITE_API_URL
-        sync: false # Render panelinden Backend linkinizi ekleyin (örn: https://kitap-dagitim-api.onrender.com/api)
+        sync: false
     routes:
       - type: rewrite
         source: /*
