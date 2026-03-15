@@ -1,0 +1,32 @@
+services:
+  # Backend API
+  - type: web
+    name: kitap-dagitim-api
+    env: node
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: node src/index.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Render panelinden Supabase URL'nizi ekleyin
+      - key: PORT
+        value: 5000
+
+  # Frontend UI
+  - type: static
+    name: kitap-dagitim-ui
+    env: static
+    plan: free
+    region: frankfurt
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false # Render panelinden Backend linkinizi ekleyin (örn: https://kitap-dagitim-api.onrender.com/api)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
