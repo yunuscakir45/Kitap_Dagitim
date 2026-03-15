@@ -83,31 +83,45 @@ const Books = () => {
         try {
             setIsFetchingFromGoogle(true);
             setError('');
-            const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${queryIsbn}`);
-            const data = await response.json();
 
-            if (data.items && data.items.length > 0) {
-                const bookInfo = data.items[0].volumeInfo;
+            // 1. Try Google Books API first
+            const googleResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${queryIsbn}`);
+            const googleData = await googleResponse.json();
+
+            if (googleData.items && googleData.items.length > 0) {
+                const bookInfo = googleData.items[0].volumeInfo;
                 setTitle(bookInfo.title || '');
-                
-                if (bookInfo.authors && bookInfo.authors.length > 0) {
-                    setAuthor(bookInfo.authors.join(', '));
-                } else {
-                    setAuthor('');
-                }
-
+                setAuthor(bookInfo.authors ? bookInfo.authors.join(', ') : '');
                 if (bookInfo.imageLinks && bookInfo.imageLinks.thumbnail) {
-                    // Replace http with https for mixed content warnings
                     setCoverImage(bookInfo.imageLinks.thumbnail.replace('http:', 'https:'));
                 } else {
                     setCoverImage('');
                 }
-            } else {
-                setError('Kitap global veritabanında bulunamadı. Lütfen bilgileri manuel giriniz.');
+                return; // Found on Google, done
             }
+
+            // 2. Fallback: Try Open Library API (better for Turkish books)
+            const openLibResponse = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${queryIsbn}&format=json&jscmd=data`);
+            const openLibData = await openLibResponse.json();
+            const openLibKey = `ISBN:${queryIsbn}`;
+
+            if (openLibData[openLibKey]) {
+                const bookInfo = openLibData[openLibKey];
+                setTitle(bookInfo.title || '');
+                setAuthor(bookInfo.authors ? bookInfo.authors.map(a => a.name).join(', ') : '');
+                if (bookInfo.cover && bookInfo.cover.medium) {
+                    setCoverImage(bookInfo.cover.medium);
+                } else {
+                    setCoverImage('');
+                }
+                return; // Found on Open Library, done
+            }
+
+            // 3. Not found on either API
+            setError('Kitap veritabanlarında bulunamadı. ISBN doğru ise bilgileri manuel girebilirsiniz.');
         } catch (err) {
-            console.error("Google Books API Error:", err);
-            setError('Kitap bilgileri getirilirken ağ hatası oluştu.');
+            console.error("Book Lookup API Error:", err);
+            setError('Kitap bilgileri getirilirken ağ hatası oluştu. Bilgileri manuel girebilirsiniz.');
         } finally {
             setIsFetchingFromGoogle(false);
         }
