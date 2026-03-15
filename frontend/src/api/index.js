@@ -13,7 +13,7 @@ export const studentApi = {
     getAll: () => api.get('/students'),
     create: (data) => api.post('/students', data),
     createMany: (data) => api.post('/students/bulk', data),
-    delete: (id) => api.delete(`/students/${id}`),
+    delete: (id, options = {}) => api.delete(`/students/${id}`, { data: options }),
 };
 
 export const bookApi = {

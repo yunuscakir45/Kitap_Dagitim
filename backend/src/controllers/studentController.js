@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const studentService = require('../services/StudentService');
 
 // Bütün aktif öğrencileri getirir
 const getStudents = async (req, res) => {
@@ -39,35 +40,28 @@ const createStudent = async (req, res) => {
     }
 };
 
-// Öğrenciyi siler (Soft Delete - isActive: false)
+/**
+ * Öğrenciyi siler
+ * @param {boolean} req.body.returnBooks - Kitaplar iade mi edildi? (Default: true)
+ */
 const deleteStudent = async (req, res) => {
     try {
         const { id } = req.params;
+        const { returnBooks } = req.body;
 
-        // Öğrencinin elinde kitap var mı kontrol et
-        const student = await prisma.student.findUnique({
-            where: { id: parseInt(id) },
-            include: { currentBooks: true }
+        const deletedStudent = await studentService.deleteStudent(id, { 
+            returnBooks: returnBooks !== undefined ? returnBooks : true 
         });
 
-        if (!student) {
-            return res.status(404).json({ error: 'Öğrenci bulunamadı.' });
-        }
-
-        if (student.currentBooks.length > 0) {
-            return res.status(400).json({ error: 'Öğrencinin elinde kitap varken silinemez. Lütfen önce kitabı teslim alınız.' });
-        }
-
-        // Soft delete
-        const deletedStudent = await prisma.student.update({
-            where: { id: parseInt(id) },
-            data: { isActive: false },
+        res.json({ 
+            message: 'Öğrenci başarıyla silindi.', 
+            student: deletedStudent 
         });
-
-        res.json({ message: 'Öğrenci başarıyla silindi.', student: deletedStudent });
     } catch (error) {
         console.error('Error deleting student:', error);
-        res.status(500).json({ error: 'Öğrenci silinirken bir hata oluştu.' });
+        res.status(500).json({ 
+            error: error.message || 'Öğrenci silinirken bir hata oluştu.' 
+        });
     }
 };
 

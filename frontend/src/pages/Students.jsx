@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { studentApi, reportApi } from '../api';
 import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle, Download, FileDown } from 'lucide-react';
 import OCRScanner from '../components/OCRScanner';
+import DeleteStudentModal from '../components/DeleteStudentModal';
 import { generateStudentPdf, generateClassPdf } from '../utils/pdfGenerator';
 
 const Students = () => {
@@ -19,6 +20,9 @@ const Students = () => {
     // Bulk Add States
     const [showScanner, setShowScanner] = useState(false);
     const [pendingStudents, setPendingStudents] = useState([]);
+
+    // Delete Modal State
+    const [studentToDelete, setStudentToDelete] = useState(null);
 
     useEffect(() => {
         fetchStudents();
@@ -89,18 +93,25 @@ const Students = () => {
         setPendingStudents(newArr);
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Bu öğrenciyi silmek istediğinize emin misiniz?')) return;
+    const handleDelete = (student) => {
+        setStudentToDelete(student);
+    };
+
+    const confirmDelete = async (returnBooks = true) => {
+        if (!studentToDelete) return;
 
         try {
             setLoading(true);
-            await studentApi.delete(id);
+            await studentApi.delete(studentToDelete.id, { returnBooks });
             await fetchStudents();
             setError('');
+            setSuccessMessage('Öğrenci başarıyla silindi.');
+            setTimeout(() => setSuccessMessage(''), 3000);
         } catch (err) {
-            setError(err.response?.data?.error || 'Öğrenci silinemedi. Elinde kitap olabilir.');
+            setError(err.response?.data?.error || 'Öğrenci silinemedi.');
         } finally {
             setLoading(false);
+            setStudentToDelete(null);
         }
     };
 
@@ -330,7 +341,7 @@ const Students = () => {
                                                     <Download size={16} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(student.id)}
+                                                    onClick={() => handleDelete(student)}
                                                     className="btn-destructive p-2"
                                                     title="Sil"
                                                     disabled={loading}
@@ -361,6 +372,14 @@ const Students = () => {
                     onClose={() => setShowScanner(false)} 
                 />
             )}
+
+            {/* Delete Confirmation Modal */}
+            <DeleteStudentModal 
+                student={studentToDelete}
+                loading={loading}
+                onClose={() => setStudentToDelete(null)}
+                onConfirm={confirmDelete}
+            />
 
         </div>
     );
