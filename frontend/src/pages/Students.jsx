@@ -3,6 +3,7 @@ import { studentApi, reportApi } from '../api';
 import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle, Download, FileDown } from 'lucide-react';
 import OCRScanner from '../components/OCRScanner';
 import DeleteStudentModal from '../components/DeleteStudentModal';
+import StudentProfileModal from '../components/StudentProfileModal';
 import { generateStudentPdf, generateClassPdf } from '../utils/pdfGenerator';
 
 const Students = () => {
@@ -313,7 +314,10 @@ const Students = () => {
                                         <li key={student.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex justify-between items-center group">
 
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                                                <div 
+                                                    className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold cursor-pointer hover:bg-indigo-200 transition-colors"
+                                                    onClick={() => setSelectedStudentId(student.id)}
+                                                >
                                                     {student.fullName.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
@@ -321,7 +325,10 @@ const Students = () => {
                                                         <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
                                                             {student.studentNumber ? `#${student.studentNumber}` : 'No Yok'}
                                                         </span>
-                                                        <h4 className="font-medium text-slate-800 dark:text-slate-200">
+                                                        <h4 
+                                                            className="font-medium text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-600 transition-colors"
+                                                            onClick={() => setSelectedStudentId(student.id)}
+                                                        >
                                                             {student.fullName}
                                                         </h4>
                                                     </div>
@@ -382,6 +389,14 @@ const Students = () => {
                 onClose={() => setStudentToDelete(null)}
                 onConfirm={confirmDelete}
             />
+
+            {/* Student Profile Modal */}
+            {selectedStudentId && (
+                <StudentProfileModal 
+                    studentId={selectedStudentId}
+                    onClose={() => setSelectedStudentId(null)}
+                />
+            )}
 
         </div>
     );
