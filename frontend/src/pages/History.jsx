@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { distributionApi, studentApi } from '../api';
-import { History as HistoryIcon, RotateCcw, Search, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { distributionApi, studentApi, reportApi } from '../api';
+import { History as HistoryIcon, RotateCcw, Search, Calendar, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { generateStudentPdf } from '../utils/pdfGenerator';
 
 const History = () => {
     const [distributions, setDistributions] = useState([]);
@@ -124,7 +125,25 @@ const History = () => {
 
                         {studentHistory && (
                             <div className="mt-6">
-                                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Okuduğu Kitaplar</h4>
+                                <div className="flex justify-between items-center mb-3">
+                                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Okuduğu Kitaplar</h4>
+                                    {studentHistory.length > 0 && (
+                                        <button
+                                            onClick={async () => {
+                                                try {
+                                                    const res = await reportApi.getStudentReport(selectedStudentId);
+                                                    generateStudentPdf(res.data);
+                                                } catch (err) {
+                                                    setError('Rapor indirilemedi.');
+                                                }
+                                            }}
+                                            className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-300 px-2.5 py-1.5 rounded-lg transition-colors"
+                                            title="PDF olarak indir"
+                                        >
+                                            <Download size={12} /> PDF
+                                        </button>
+                                    )}
+                                </div>
                                 {studentHistory.length === 0 ? (
                                     <p className="text-sm text-slate-500 italic">Henüz okuduğu kitap yok.</p>
                                 ) : (

@@ -33,4 +33,9 @@ export const adminApi = {
     resetAll: (data) => api.post('/admin/reset-all', data),
 };
 
+export const reportApi = {
+    getStudentReport: (id) => api.get(`/reports/student/${id}`),
+    getClassReport: () => api.get('/reports/class'),
+};
+
 export default api;

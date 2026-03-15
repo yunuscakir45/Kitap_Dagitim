@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { studentApi } from '../api';
-import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { studentApi, reportApi } from '../api';
+import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle, Download, FileDown } from 'lucide-react';
 import OCRScanner from '../components/OCRScanner';
+import { generateStudentPdf, generateClassPdf } from '../utils/pdfGenerator';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
@@ -103,14 +104,43 @@ const Students = () => {
         }
     };
 
+    const handleDownloadStudentReport = async (studentId) => {
+        try {
+            const res = await reportApi.getStudentReport(studentId);
+            generateStudentPdf(res.data);
+        } catch (err) {
+            setError('Rapor oluşturulurken hata oluştu.');
+        }
+    };
+
+    const handleDownloadClassReport = async () => {
+        try {
+            setLoading(true);
+            const res = await reportApi.getClassReport();
+            generateClassPdf(res.data);
+        } catch (err) {
+            setError('Sınıf raporu oluşturulurken hata oluştu.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
 
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Öğrenci Yönetimi</h1>
                     <p className="text-slate-500 text-sm mt-1">Sınıftaki öğrencileri ekleyin veya çıkarın.</p>
                 </div>
+                <button
+                    onClick={handleDownloadClassReport}
+                    disabled={loading || students.length === 0}
+                    className="flex items-center gap-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition-colors shadow-sm disabled:opacity-50"
+                    title="Tüm sınıfın okuma raporunu PDF olarak indir"
+                >
+                    <FileDown size={16} /> Sınıf Raporu İndir
+                </button>
             </div>
 
             {error && (
@@ -291,14 +321,23 @@ const Students = () => {
                                                 </div>
                                             </div>
 
-                                            <button
-                                                onClick={() => handleDelete(student.id)}
-                                                className="btn-destructive opacity-0 group-hover:opacity-100 transition-opacity p-2"
-                                                title="Sil"
-                                                disabled={loading}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => handleDownloadStudentReport(student.id)}
+                                                    className="p-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                                    title="Okuma raporunu indir"
+                                                >
+                                                    <Download size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(student.id)}
+                                                    className="btn-destructive p-2"
+                                                    title="Sil"
+                                                    disabled={loading}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
 
                                         </li>
                                     ))}
