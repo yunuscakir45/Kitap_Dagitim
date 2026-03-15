@@ -11,6 +11,7 @@ const api = axios.create({
 
 export const studentApi = {
     getAll: () => api.get('/students'),
+    getById: (id) => api.get(`/students/${id}`),
     create: (data) => api.post('/students', data),
     createMany: (data) => api.post('/students/bulk', data),
     delete: (id, options = {}) => api.delete(`/students/${id}`, { data: options }),

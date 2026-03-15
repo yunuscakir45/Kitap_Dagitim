@@ -97,9 +97,59 @@ const createManyStudents = async (req, res) => {
     }
 };
 
+// Belirli bir öğrencinin detaylı profil bilgilerini getirir
+const getStudentDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const studentId = parseInt(id);
+
+        const student = await prisma.student.findUnique({
+            where: { id: studentId },
+            include: {
+                currentBooks: true,
+                readingHistory: {
+                    include: {
+                        book: true,
+                        distribution: true
+                    },
+                    orderBy: { readAt: 'desc' }
+                },
+                lostBooks: {
+                    include: {
+                        currentHolder: true
+                    },
+                    orderBy: { lostAt: 'desc' }
+                }
+            }
+        });
+
+        if (!student) {
+            return res.status(404).json({ error: 'Öğrenci bulunamadı.' });
+        }
+
+        // İstatistikleri hesapla
+        const stats = {
+            totalBooksRead: student.readingHistory.length,
+            lostBooksCount: student.lostBooks.length,
+            firstLibraryVisit: student.readingHistory.length > 0 
+                ? student.readingHistory[student.readingHistory.length - 1].readAt 
+                : null,
+            lastLibraryVisit: student.readingHistory.length > 0 
+                ? student.readingHistory[0].readAt 
+                : null,
+        };
+
+        res.json({ ...student, stats });
+    } catch (error) {
+        console.error('Error fetching student details:', error);
+        res.status(500).json({ error: 'Öğrenci detayları getirilirken bir hata oluştu.' });
+    }
+};
+
 module.exports = {
     getStudents,
     createStudent,
     createManyStudents,
-    deleteStudent
+    deleteStudent,
+    getStudentDetails
 };

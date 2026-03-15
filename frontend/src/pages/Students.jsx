@@ -23,6 +23,8 @@ const Students = () => {
 
     // Delete Modal State
     const [studentToDelete, setStudentToDelete] = useState(null);
+    // Student Profile Modal State
+    const [selectedStudentId, setSelectedStudentId] = useState(null); // Added state
 
     useEffect(() => {
         fetchStudents();

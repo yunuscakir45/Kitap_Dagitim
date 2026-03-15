@@ -14,4 +14,7 @@ router.post('/bulk', studentController.createManyStudents);
 // DELETE /api/students/:id -> Öğrenciyi sil (soft delete)
 router.delete('/:id', studentController.deleteStudent);
 
+// GET /api/students/:id -> Öğrenci detaylarını getir
+router.get('/:id', studentController.getStudentDetails);
+
 module.exports = router;
