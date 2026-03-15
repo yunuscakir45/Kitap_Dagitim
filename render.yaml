@@ -19,7 +19,6 @@ services:
     name: kitap-dagitim-ui
     env: static
     plan: free
-    region: frankfurt
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
