@@ -15,14 +15,14 @@ services:
         value: 5000
 
   # Frontend UI
-  - type: static_site
+  - type: web
     name: kitap-dagitim-ui
     env: static
     plan: free
     region: frankfurt
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         sync: false
