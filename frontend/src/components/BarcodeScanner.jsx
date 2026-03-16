@@ -42,14 +42,13 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                 const config = {
                     fps: 20,
                     qrbox: { width: 250, height: 150 },
-                    aspectRatio: 1.0,
                 };
                 
+                // Relaxed constraints to avoid OverconstrainedError
                 const videoConstraints = {
-                    deviceId: { exact: selectedCameraId },
-                    focusMode: "continuous",
-                    width: { min: 640, ideal: 1280, max: 1920 },
-                    height: { min: 480, ideal: 720, max: 1080 },
+                    deviceId: selectedCameraId,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
                 };
 
                 await html5QrCode.start(
@@ -67,8 +66,21 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                     () => {}
                 );
             } catch (err) {
-                console.error("Scanner start error:", err);
-                setError('Kamera başlatılamadı. Farklı bir kamera seçmeyi deneyin.');
+                console.warn("High-res scanner start failed, trying fallback...", err);
+                try {
+                    // Fallback to default device ID start
+                    await html5QrCode.start(
+                        selectedCameraId,
+                        { fps: 10, qrbox: { width: 250, height: 150 } },
+                        (decodedText) => {
+                            html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
+                        },
+                        () => {}
+                    );
+                } catch (fallbackErr) {
+                    console.error("Final scanner start error:", fallbackErr);
+                    setError('Kamera başlatılamadı. Lütfen başka bir kamera seçin veya izinleri kontrol edin.');
+                }
             }
         };
 
