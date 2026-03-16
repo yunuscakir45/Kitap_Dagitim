@@ -129,8 +129,8 @@ const Distribute = () => {
         <div className="max-w-4xl mx-auto space-y-6">
 
             <div>
-                <h1 className="text-2xl font-bold text-foreground">Yeni Dağıtım Başlat</h1>
-                <p className="text-muted-foreground text-sm mt-1">Önce öğrencilerin bugünkü durumlarını belirleyin.</p>
+                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Yeni Dağıtım Başlat</h1>
+                <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Önce öğrencilerin bugünkü durumlarını belirleyin.</p>
             </div>
 
             {error && (

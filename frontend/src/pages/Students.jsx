@@ -144,8 +144,8 @@ const Students = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Öğrenci Yönetimi</h1>
-                    <p className="text-muted-foreground text-sm mt-1">Mevcut öğrencileri yönetin ve yeni kayıt oluşturun.</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Öğrenci Yönetimi</h1>
+                    <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Mevcut öğrencileri yönetin ve yeni kayıt oluşturun.</p>
                 </div>
                 <button
                     onClick={handleDownloadClassReport}

@@ -45,8 +45,8 @@ const Dashboard = () => {
                 {icon}
             </div>
             <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wider text-[10px] font-bold">{title}</p>
-                <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{value}</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-0.5">{title}</p>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-none">{value}</h3>
             </div>
         </div>
     );
@@ -55,8 +55,8 @@ const Dashboard = () => {
         <div className="space-y-6">
 
             <div>
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Hoş Geldiniz</h1>
-                <p className="text-muted-foreground text-sm mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
+                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Hoş Geldiniz</h1>
+                <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
             </div>
 
             {loading ? (
@@ -107,18 +107,18 @@ const Dashboard = () => {
                         </div>
 
                         <div className="glass-panel p-6">
-                            <h3 className="font-bold text-lg border-b border-border pb-3 mb-4 text-foreground">Son Dağıtım İşlemi</h3>
+                            <h3 className="font-bold text-lg border-b border-border pb-3 mb-6 text-slate-900 dark:text-white">Son Dağıtım İşlemi</h3>
                             {stats.latestDistribution ? (
-                                <div className="space-y-4">
-                                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-border">
-                                        <p className="text-sm text-muted-foreground mb-1">Tarih</p>
-                                        <p className="font-bold text-foreground">
+                                <div className="space-y-6">
+                                    <div className="flex flex-col">
+                                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">İşlem Tarihi</p>
+                                        <p className="text-lg font-bold text-slate-800 dark:text-slate-200">
                                             {new Date(stats.latestDistribution.distributedAt).toLocaleDateString('tr-TR')}
                                         </p>
                                     </div>
-                                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-border">
-                                        <p className="text-sm text-muted-foreground mb-1">Etki</p>
-                                        <p className="font-bold text-indigo-600 dark:text-indigo-400">
+                                    <div className="flex flex-col">
+                                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Dağıtım Etkisi</p>
+                                        <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                                             {stats.latestDistribution.items.length} Kitap el değiştirdi
                                         </p>
                                     </div>

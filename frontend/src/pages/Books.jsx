@@ -167,8 +167,8 @@ const Books = () => {
 
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Kitap Yönetimi</h1>
-                    <p className="text-muted-foreground text-sm mt-1">Sınıf kütüphanesine kitap ekleyin veya çıkarın.</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Kitap Yönetimi</h1>
+                    <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Sınıf kütüphanesine kitap ekleyin veya çıkarın.</p>
                 </div>
             </div>
 

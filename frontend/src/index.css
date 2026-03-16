@@ -13,11 +13,11 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #6366f1;
+  --foreground: #020617; /* Stronger dark for light mode */
+  --primary: #4f46e5;
   --primary-foreground: #ffffff;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #020617;
   --border: #e2e8f0;
   --radius: 0.75rem;
 }
