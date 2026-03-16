@@ -153,6 +153,7 @@ const History = () => {
                                                 <div className="flex items-center gap-2 font-medium text-slate-800 dark:text-slate-200">
                                                     <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs">A</span>
                                                     Kitap #{history.book?.labelNumber || '?'}
+                                                    <span className="text-slate-400 font-normal italic ml-1">"{history.book?.title || 'İsimsiz'}"</span>
                                                 </div>
                                                 <div className="text-xs text-slate-500 mt-2 flex items-center gap-1">
                                                     <Calendar size={12} /> {new Date(history.readAt).toLocaleDateString('tr-TR')}
@@ -215,7 +216,7 @@ const History = () => {
                                                     <table className="w-full text-sm text-left">
                                                         <thead className="text-xs text-slate-500 uppercase bg-slate-100 dark:bg-slate-800">
                                                             <tr>
-                                                                <th className="px-4 py-2 rounded-l-md">Kitap #</th>
+                                                                <th className="px-4 py-2 rounded-l-md">Kitap</th>
                                                                 <th className="px-4 py-2">Eski Sahibi</th>
                                                                 <th className="px-4 py-2 rounded-r-md">Yeni Sahibi (Alan)</th>
                                                             </tr>
@@ -223,7 +224,12 @@ const History = () => {
                                                         <tbody>
                                                             {dist.items?.map(item => (
                                                                 <tr key={item.id} className="border-b border-[color:var(--border)] last:border-0 hover:bg-slate-100 dark:hover:bg-slate-700/50">
-                                                                    <td className="px-4 py-2 font-medium">{item.book?.labelNumber}</td>
+                                                                    <td className="px-4 py-2 font-medium">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs text-slate-400">No: {item.book?.labelNumber}</span>
+                                                                            <span className="font-semibold text-slate-700 dark:text-slate-300">"{item.book?.title || 'İsimsiz'}"</span>
+                                                                        </div>
+                                                                    </td>
                                                                     <td className="px-4 py-2 text-slate-500">{item.fromStudent?.fullName || <span className="italic text-xs">Yok (Yeni kitap)</span>}</td>
                                                                     <td className="px-4 py-2 font-medium text-emerald-600 dark:text-emerald-400">{item.toStudent?.fullName}</td>
                                                                 </tr>

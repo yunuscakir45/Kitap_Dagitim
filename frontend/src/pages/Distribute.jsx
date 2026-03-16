@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { studentApi, distributionApi } from '../api';
-import { Users, AlertCircle, ArrowRight, CheckCircle2, UserX, BookX, Trash2 } from 'lucide-react';
+import { studentApi, distributionApi, bookApi } from '../api';
+import { Users, AlertCircle, ArrowRight, CheckCircle2, UserX, BookX, Trash2, Book as BookIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Distribute = () => {
     const [students, setStudents] = useState([]);
+    const [books, setBooks] = useState([]); // Book lookup for results
     const [attendance, setAttendance] = useState({}); // { studentId: 'PRESENT' | 'ABSENT' | 'NO_BOOK' | 'LOST_BOOK' }
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
@@ -14,31 +15,37 @@ const Distribute = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchStudents();
+        fetchData();
     }, []);
 
-    const fetchStudents = async () => {
+    const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await studentApi.getAll();
-            setStudents(res.data);
+            const [studentsRes, booksRes] = await Promise.all([
+                studentApi.getAll(),
+                bookApi.getAll()
+            ]);
+            
+            setStudents(studentsRes.data);
+            setBooks(booksRes.data);
 
-            // Default olarak herkesi 'PRESENT' kabul et
             const initialAttendance = {};
-            res.data.forEach(s => {
+            studentsRes.data.forEach(s => {
                 initialAttendance[s.id] = 'PRESENT';
             });
             setAttendance(initialAttendance);
 
-            if (res.data.length === 0) {
+            if (studentsRes.data.length === 0) {
                 setError('Dağıtım yapabilmek için sınıfta en az bir öğrenci bulunmalıdır.');
             }
         } catch (err) {
-            setError('Öğrenciler yüklenirken hata oluştu.');
+            setError('Veriler yüklenirken hata oluştu.');
         } finally {
             setLoading(false);
         }
     };
+
+    const fetchStudents = fetchData; // For compatibility if called elsewhere
 
     const handleStatusChange = (studentId, status) => {
         setAttendance(prev => ({ ...prev, [studentId]: status }));
@@ -47,7 +54,6 @@ const Distribute = () => {
     const handleRunDistribution = async () => {
         if (students.length === 0) return;
 
-        // API'nin beklediği formata dönüştür: [{studentId: 1, status: 'PRESENT'}, ...]
         const attendanceArray = Object.keys(attendance).map(id => ({
             studentId: parseInt(id),
             status: attendance[id]
@@ -88,16 +94,21 @@ const Distribute = () => {
                         {Object.keys(successResult.matches).map((studentIdStr, index) => {
                             const bookId = successResult.matches[studentIdStr];
                             const student = students.find(s => s.id === parseInt(studentIdStr));
-                            const book = student?.currentBooks?.find(b => b.id === bookId) || { labelNumber: bookId };
+                            const book = books.find(b => b.id === bookId) || { labelNumber: bookId, title: 'Bilinmeyen Kitap' };
 
                             return (
-                                <div key={studentIdStr} className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-[color:var(--border)]">
+                                <div key={studentIdStr} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-[color:var(--border)] gap-3">
                                     <div className="flex items-center gap-4">
-                                        <span className="font-bold text-slate-400 w-6">#{index + 1}</span>
-                                        <div className="font-medium text-slate-800 dark:text-slate-200">{student?.fullName || 'Bilinmeyen'}</div>
+                                        <span className="font-bold text-slate-300 dark:text-slate-600 text-lg">#{index + 1}</span>
+                                        <div className="font-semibold text-slate-700 dark:text-slate-200">{student?.fullName || 'Bilinmeyen'}</div>
                                     </div>
-                                    <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md">
-                                        <ArrowRight size={16} /> Kitap No: {book.labelNumber}
+                                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                                        <ArrowRight size={16} className="text-slate-400 hidden sm:block" />
+                                        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/10 shadow-sm transition-all hover:shadow-md">
+                                            <span className="text-xs font-bold uppercase tracking-wider opacity-60">No:{book.labelNumber}</span>
+                                            <span className="h-3 w-[1px] bg-indigo-200 dark:bg-indigo-500/30 mx-0.5"></span>
+                                            <span className="font-medium text-sm italic">"{book.title}"</span>
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -106,7 +117,7 @@ const Distribute = () => {
 
                     <div className="mt-8 flex gap-4 justify-center">
                         <button onClick={() => navigate('/history')} className="btn-secondary">Geçmişe Git</button>
-                        <button onClick={() => { setSuccessResult(null); fetchStudents(); setNote(''); }} className="btn-primary">Yeni Dağıtım</button>
+                        <button onClick={() => { setSuccessResult(null); fetchData(); setNote(''); }} className="btn-primary">Yeni Dağıtım</button>
                     </div>
                 </div>
             </div>
@@ -152,16 +163,26 @@ const Distribute = () => {
                         <div className="divide-y divide-[color:var(--border)]">
                             {students.map(student => (
                                 <div key={student.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <div className="font-medium text-slate-800 dark:text-slate-200">
-                                        {student.fullName}
+                                    <div className="flex flex-col gap-1.5 flex-1">
+                                        <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                            {student.fullName}
+                                            {student.studentNumber && (
+                                                <span className="text-[10px] text-slate-400 font-normal">#{student.studentNumber}</span>
+                                            )}
+                                        </div>
                                         {student.currentBooks && student.currentBooks.length > 0 && (
-                                            <span className="ml-2 text-xs font-normal text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                                                Kitap: {student.currentBooks[0].labelNumber}
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700/50 shadow-sm text-[11px] font-medium transition-all group-hover:border-indigo-200 dark:group-hover:border-indigo-900/50">
+                                                    <BookIcon size={12} className="text-indigo-400" />
+                                                    <span className="font-bold opacity-75">No:{student.currentBooks[0].labelNumber}</span>
+                                                    <span className="h-2 w-[1px] bg-slate-300 dark:bg-slate-600"></span>
+                                                    <span className="italic truncate max-w-[150px] sm:max-w-[250px]">"{student.currentBooks[0].title || 'İsimsiz'}"</span>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
 
-                                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 self-start md:self-auto overflow-x-auto">
+                                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 self-start md:self-auto overflow-x-auto shadow-inner border border-slate-200 dark:border-slate-700/30">
                                         <button
                                             type="button"
                                             onClick={() => handleStatusChange(student.id, 'PRESENT')}
@@ -201,13 +222,13 @@ const Distribute = () => {
 
                 {students.length > 0 && (
                     <div className="p-5 border-t border-[color:var(--border)] bg-slate-50 dark:bg-slate-800/50 space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        <div className="max-w-md">
+                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5">
                                 Dağıtım Notu (İsteğe bağlı)
                             </label>
                             <input
                                 type="text"
-                                className="input-field max-w-md"
+                                className="input-field"
                                 placeholder="Örn: 3. Hafta Dağıtımı"
                                 value={note}
                                 onChange={(e) => setNote(e.target.value)}
@@ -218,14 +239,18 @@ const Distribute = () => {
                         <button
                             onClick={handleRunDistribution}
                             disabled={loading}
-                            className="btn-primary w-full md:w-auto mt-4"
+                            className="btn-primary px-8 py-2.5 flex items-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform"
                         >
-                            {loading ? 'Hesaplanıyor...' : 'Algoritmayı Çalıştır ve Dağıt'}
+                            {loading ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Hesaplanıyor...
+                                </>
+                            ) : 'Dağıt'}
                         </button>
                     </div>
                 )}
             </div>
-
         </div>
     );
 };
