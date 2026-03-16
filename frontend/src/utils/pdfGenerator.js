@@ -11,6 +11,18 @@ const COLORS = {
     accent: [16, 185, 129],       // Emerald-500
 };
 
+// Turkish character fix for standard PDF fonts (simplified version)
+const trClean = (text) => {
+    if (!text || typeof text !== 'string') return text;
+    return text
+        .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+        .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+        .replace(/ş/g, 's').replace(/Ş/g, 'S')
+        .replace(/ı/g, 'i').replace(/İ/g, 'I')
+        .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+        .replace(/ç/g, 'c').replace(/Ç/g, 'C');
+};
+
 /**
  * Adds the common header to a PDF page.
  */
@@ -25,12 +37,12 @@ const addHeader = (doc, title, subtitle) => {
     doc.setTextColor(...COLORS.white);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(title, 14, 18);
+    doc.text(trClean(title), 14, 18);
 
     // Subtitle
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(subtitle, 14, 30);
+    doc.text(trClean(subtitle), 14, 30);
 
     // Date
     const now = new Date().toLocaleDateString('tr-TR', {
@@ -95,7 +107,7 @@ export const generateStudentPdf = (data) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(...COLORS.medium);
-    doc.text(`Ad Soyad: ${student.fullName}`, 20, yPos + 16);
+    doc.text(`Ad Soyad: ${trClean(student.fullName)}`, 20, yPos + 16);
     doc.text(`Ogrenci No: ${student.studentNumber || 'Belirtilmemis'}`, 120, yPos + 16);
     doc.text(`Toplam Okunan Kitap: ${stats.totalBooksRead}`, 20, yPos + 24);
     doc.text(`Elindeki Kitap Sayisi: ${stats.currentBookCount}`, 120, yPos + 24);
@@ -157,8 +169,8 @@ export const generateStudentPdf = (data) => {
             body: currentBooks.map((b, i) => [
                 i + 1,
                 b.labelNumber || '-',
-                b.title || 'Isimsiz',
-                b.author || '-',
+                trClean(b.title) || 'Isimsiz',
+                trClean(b.author) || '-',
             ]),
             theme: 'grid',
             headStyles: {
@@ -194,8 +206,8 @@ export const generateStudentPdf = (data) => {
             body: readingHistory.map((h, i) => [
                 i + 1,
                 h.book.labelNumber || '-',
-                h.book.title || 'Isimsiz',
-                h.book.author || '-',
+                trClean(h.book.title) || 'Isimsiz',
+                trClean(h.book.author) || '-',
                 new Date(h.readAt).toLocaleDateString('tr-TR'),
             ]),
             theme: 'grid',
@@ -307,7 +319,7 @@ export const generateClassPdf = (data) => {
         doc.setTextColor(...COLORS.primary);
         doc.setFont('helvetica', 'bold');
         doc.text(
-            `${entry.student.fullName}${entry.student.studentNumber ? ` (No: ${entry.student.studentNumber})` : ''}`,
+            trClean(`${entry.student.fullName}${entry.student.studentNumber ? ` (No: ${entry.student.studentNumber})` : ''}`),
             14, yPos
         );
         yPos += 5;
