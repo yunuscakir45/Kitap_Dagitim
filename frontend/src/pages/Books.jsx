@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { bookApi } from '../api';
-import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon } from 'lucide-react';
 import BarcodeScanner from '../components/BarcodeScanner';
+import BookOCRScanner from '../components/BookOCRScanner';
+import { Camera } from 'lucide-react';
 
 const Books = () => {
     const [books, setBooks] = useState([]);
@@ -17,6 +18,7 @@ const Books = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showScanner, setShowScanner] = useState(false);
+    const [showBookOCR, setShowBookOCR] = useState(false);
     const [isFetchingFromGoogle, setIsFetchingFromGoogle] = useState(false);
 
     useEffect(() => {
@@ -75,6 +77,11 @@ const Books = () => {
         setIsbn(scannedIsbn);
         setShowScanner(false);
         await fetchGoogleBooksData(scannedIsbn);
+    };
+
+    const handleBookOCRSuccess = (scannedTitle) => {
+        setTitle(scannedTitle);
+        setShowBookOCR(false);
     };
 
     const fetchGoogleBooksData = async (queryIsbn) => {
@@ -167,13 +174,24 @@ const Books = () => {
                             <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-700 dark:text-slate-200">
                                 <BookPlus size={20} className="text-indigo-500" /> Yeni Kitap
                             </h3>
-                            <button
-                                type="button"
-                                onClick={() => setShowScanner(true)}
-                                className="flex items-center gap-1.5 text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 dark:border-indigo-500/20"
-                            >
-                                <ScanBarcode size={14} /> Tara
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowScanner(true)}
+                                    className="flex items-center gap-1.5 text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 dark:border-indigo-500/20"
+                                    title="ISBN Barkodu Tara"
+                                >
+                                    <ScanBarcode size={14} /> Barkod
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBookOCR(true)}
+                                    className="flex items-center gap-1.5 text-xs font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-300 px-3 py-1.5 rounded-lg transition-colors border border-amber-200 dark:border-amber-500/20"
+                                    title="Kitap İsminden Tara (OCR)"
+                                >
+                                    <Camera size={14} /> OCR
+                                </button>
+                            </div>
                         </div>
                         
                         {isFetchingFromGoogle && (
@@ -345,6 +363,13 @@ const Books = () => {
                 />
             )}
 
+            {/* OCR Scanner Modal */}
+            {showBookOCR && (
+                <BookOCRScanner
+                    onScanComplete={handleBookOCRSuccess}
+                    onClose={() => setShowBookOCR(false)}
+                />
+            )}
         </div>
     );
 };
