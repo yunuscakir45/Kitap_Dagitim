@@ -21,6 +21,7 @@ export const bookApi = {
     getAll: () => api.get('/books'),
     create: (data) => api.post('/books', data),
     delete: (id) => api.delete(`/books/${id}`),
+    reactivate: (id) => api.post(`/books/${id}/reactivate`),
 };
 
 export const distributionApi = {

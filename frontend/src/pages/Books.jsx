@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { bookApi } from '../api';
-import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon, Camera } from 'lucide-react';
+import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon, Camera, RotateCcw, AlertTriangle } from 'lucide-react';
 import BarcodeScanner from '../components/BarcodeScanner';
 import BookOCRScanner from '../components/BookOCRScanner';
 
@@ -73,6 +73,19 @@ const Books = () => {
         }
     };
     
+    const handleReactivate = async (id) => {
+        try {
+            setLoading(true);
+            await bookApi.reactivate(id);
+            await fetchBooks();
+            setError('');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Kitap aktifleştirilemedi.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleScanSuccess = async (scannedIsbn) => {
         setIsbn(scannedIsbn);
         setShowScanner(false);
@@ -288,64 +301,96 @@ const Books = () => {
                             </span>
                         </div>
 
-                        <div className="max-h-[500px] overflow-y-auto p-0">
+                        <div className="max-h-[600px] overflow-y-auto p-0">
                             {books.length === 0 && !loading ? (
                                 <div className="p-8 text-center text-slate-500">Henüz hiç kitap yok.</div>
                             ) : (
                                 <ul className="divide-y divide-[color:var(--border)]">
-                                    {books.map(book => (
-                                        <li key={book.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex justify-between items-center group">
+                                    {books.map(book => {
+                                        const isLost = book.lostAt !== null;
+                                        return (
+                                            <li key={book.id} className={`p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex justify-between items-center group ${isLost ? 'bg-slate-50/50 dark:bg-slate-900/20' : ''}`}>
 
-                                            <div className="flex items-center gap-4">
-                                                {/* Kapak Görseli veya Varsayılan İkon */}
-                                                <div className="w-12 h-16 shrink-0 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-600">
-                                                    {book.coverImage ? (
-                                                        <img src={book.coverImage} alt={book.title || 'Kapak'} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <ImageIcon size={20} className="text-slate-400" />
-                                                    )}
-                                                </div>
-                                                
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
-                                                            #{book.labelNumber}
-                                                        </span>
-                                                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
-                                                            {book.title || 'İsimsiz Kitap'}
-                                                        </h4>
+                                                <div className="flex items-center gap-4">
+                                                    {/* Kapak Görseli */}
+                                                    <div className={`w-12 h-16 shrink-0 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-600 ${isLost ? 'grayscale opacity-60' : ''}`}>
+                                                        {book.coverImage ? (
+                                                            <img src={book.coverImage} alt={book.title || 'Kapak'} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <ImageIcon size={20} className="text-slate-400" />
+                                                        )}
                                                     </div>
                                                     
-                                                    {book.author && (
-                                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                                                            {book.author}
-                                                        </p>
-                                                    )}
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${isLost ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300'}`}>
+                                                                #{book.labelNumber}
+                                                            </span>
+                                                            <h4 className={`font-semibold text-slate-800 dark:text-slate-200 line-clamp-1 ${isLost ? 'text-slate-500' : ''}`}>
+                                                                {book.title || 'İsimsiz Kitap'}
+                                                            </h4>
+                                                            {isLost && (
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 px-1.5 py-0.5 rounded flex items-center gap-1 border border-amber-200 dark:border-amber-900/50">
+                                                                    <AlertTriangle size={10} /> Kayıp
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        {book.author && (
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                                                                {book.author}
+                                                            </p>
+                                                        )}
 
-                                                    {book.currentHolder && (
-                                                        <p className="text-xs text-amber-600 flex items-center gap-1 mt-1 font-medium">
-                                                            <UserCheck size={12} /> {book.currentHolder.fullName} adlı öğrencide
-                                                        </p>
-                                                    )}
-                                                    {!book.currentHolder && (
-                                                        <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-medium">
-                                                            Boşta (Dağıtıma hazır)
-                                                        </p>
-                                                    )}
+                                                        {isLost ? (
+                                                            <div className="mt-1 space-y-0.5">
+                                                                <p className="text-[11px] text-amber-600 dark:text-amber-500 font-medium flex items-center gap-1">
+                                                                    <UserCheck size={12} /> {book.lostBy?.fullName} tarafından kaybedildi
+                                                                </p>
+                                                                <p className="text-[10px] text-slate-400 italic">
+                                                                    {new Date(book.lostAt).toLocaleDateString('tr-TR')} tarihinde
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                {book.currentHolder ? (
+                                                                    <p className="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1 mt-1 font-medium">
+                                                                        <UserCheck size={12} /> {book.currentHolder.fullName} adlı öğrencide
+                                                                    </p>
+                                                                ) : (
+                                                                    <p className="text-xs text-green-600 dark:text-green-500 flex items-center gap-1 mt-1 font-medium">
+                                                                        Kütüphanede (Aktif)
+                                                                    </p>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <button
-                                                onClick={() => handleDelete(book.id)}
-                                                className="btn-destructive opacity-0 group-hover:opacity-100 transition-opacity p-2"
-                                                title="Sil"
-                                                disabled={loading}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                                <div className="flex items-center gap-2">
+                                                    {isLost && (
+                                                        <button
+                                                            onClick={() => handleReactivate(book.id)}
+                                                            className="flex items-center gap-1.5 text-xs font-semibold bg-green-50 hover:bg-green-100 text-green-700 dark:bg-green-500/10 dark:hover:bg-green-500/20 dark:text-green-400 px-3 py-1.5 rounded-lg transition-all border border-green-200 dark:border-green-500/20 shadow-sm"
+                                                            title="Kitap Bulundu (Aktifleştir)"
+                                                            disabled={loading}
+                                                        >
+                                                            <RotateCcw size={14} /> Bulundu
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleDelete(book.id)}
+                                                        className="btn-destructive opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                                                        title="Sil"
+                                                        disabled={loading}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
 
-                                        </li>
-                                    ))}
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
                             )}
                         </div>

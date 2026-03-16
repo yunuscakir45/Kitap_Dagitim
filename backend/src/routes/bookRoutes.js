@@ -11,4 +11,7 @@ router.post('/', bookController.createBook);
 // DELETE /api/books/:id -> Kitabı sil (soft delete)
 router.delete('/:id', bookController.deleteBook);
 
+// POST /api/books/:id/reactivate -> Kayıp kitabı aktifleştir
+router.post('/:id/reactivate', bookController.reactivateBook);
+
 module.exports = router;

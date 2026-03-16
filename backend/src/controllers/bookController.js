@@ -1,18 +1,40 @@
 const prisma = require('../utils/prisma');
+const bookService = require('../services/BookService');
 
-// Bütün aktif kitapları getirir
+// Bütün aktif ve kayıp kitapları getirir (Silinmişler hariç)
 const getBooks = async (req, res) => {
     try {
         const books = await prisma.book.findMany({
-            where: { isActive: true },
+            where: {
+                OR: [
+                    { isActive: true },
+                    { lostAt: { not: null } }
+                ]
+            },
             include: {
                 currentHolder: true, // Kitap şu an kimde ise getirecek
+                lostBy: true,        // Kitabı kim kaybettiyse getirecek
+            },
+            orderBy: {
+                labelNumber: 'asc'
             }
         });
         res.json(books);
     } catch (error) {
         console.error('Error fetching books:', error);
         res.status(500).json({ error: 'Kitaplar getirilirken bir hata oluştu.' });
+    }
+};
+
+// Kayıp kitabı tekrar aktifleştirir
+const reactivateBook = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await bookService.reactivateBook(id);
+        res.json({ message: 'Kitap başarıyla aktifleştirildi.', book });
+    } catch (error) {
+        console.error('Error reactivating book:', error);
+        res.status(500).json({ error: 'Kitap aktifleştirilirken bir hata oluştu.' });
     }
 };
 
@@ -94,5 +116,6 @@ const deleteBook = async (req, res) => {
 module.exports = {
     getBooks,
     createBook,
-    deleteBook
+    deleteBook,
+    reactivateBook
 };
