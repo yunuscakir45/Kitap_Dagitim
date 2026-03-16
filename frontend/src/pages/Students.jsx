@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentApi, reportApi } from '../api';
-import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle, Download, FileDown } from 'lucide-react';
+import { UserPlus, Trash2, BookUser, ScanText, CheckCircle2, AlertCircle, Download, FileDown, Book as BookIcon } from 'lucide-react';
 import OCRScanner from '../components/OCRScanner';
 import DeleteStudentModal from '../components/DeleteStudentModal';
 import StudentProfileModal from '../components/StudentProfileModal';
@@ -333,9 +333,14 @@ const Students = () => {
                                                     </div>
                                                     
                                                     {student.currentBooks && student.currentBooks.length > 0 && (
-                                                        <p className="text-xs text-indigo-600 flex items-center gap-1 mt-1 font-medium">
-                                                            <BookUser size={12} /> Elinde {student.currentBooks[0].labelNumber} no'lu kitap var
-                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-1.5">
+                                                            <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700/50 shadow-sm text-[11px] font-medium transition-all group-hover:border-indigo-200 dark:group-hover:border-indigo-900/50">
+                                                                <BookIcon size={12} className="text-indigo-400" />
+                                                                <span className="font-bold opacity-75">No:{student.currentBooks[0].labelNumber}</span>
+                                                                <span className="h-2 w-[1px] bg-slate-300 dark:bg-slate-600"></span>
+                                                                <span className="italic truncate max-w-[150px] sm:max-w-[250px]">"{student.currentBooks[0].title || 'İsimsiz'}"</span>
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
