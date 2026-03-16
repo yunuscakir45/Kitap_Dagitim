@@ -159,16 +159,51 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
             const text = result.data.text;
             setRawText(text);
 
-            // Clean lines and find potential titles
-            const lines = text.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 2)
-                .map(line => line.toLocaleUpperCase('tr-TR'));
+            // Analysis based on lines to filter noise and stylized text errors
+            const rawLines = result.data.lines || [];
+            const processedLines = rawLines
+                .map(line => {
+                    const lineText = line.text.trim();
+                    // Basic noise cleaning
+                    const cleaned = lineText
+                        .replace(/[|\\/_~={}[\]<>]/g, '') // Remove common OCR noise symbols
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    
+                    // Score the line based on confidence and "word-likeness"
+                    const confidence = line.confidence || 0;
+                    const height = line.bbox.y1 - line.bbox.y0;
+                    
+                    // A line is likely a title if it:
+                    // 1. Has reasonable confidence
+                    // 2. Is not too short/long
+                    // 3. Contains letters (not just symbols/numbers)
+                    const hasLetters = /[a-zA-ZçğıiöşüÇĞIİÖŞÜ]/.test(cleaned);
+                    const letterCount = (cleaned.match(/[a-zA-ZçğıiöşüÇĞIİÖŞÜ]/g) || []).length;
+                    const symbolCount = (cleaned.match(/[^a-zA-Z0-9\s]/g) || []).length;
+                    
+                    return {
+                        text: cleaned.toLocaleUpperCase('tr-TR'),
+                        confidence,
+                        height,
+                        isLikely: hasLetters && letterCount > symbolCount && cleaned.length > 2 && cleaned.length < 100
+                    };
+                })
+                .filter(line => line.isLikely && line.confidence > 20) // Filter out pure garbage
+                .sort((a, b) => {
+                    // Sort primarily by height (titles are big), secondarily by confidence
+                    const heightDiff = b.height - a.height;
+                    if (Math.abs(heightDiff) > 10) return heightDiff;
+                    return b.confidence - a.confidence;
+                });
 
-            if (lines.length === 0) {
-                setError('Resimden kitap ismi okunamadı.');
+            // Extract unique candidates
+            const uniqueTexts = Array.from(new Set(processedLines.map(l => l.text)));
+            
+            if (uniqueTexts.length === 0) {
+                setError('Resimden anlamlı bir kitap ismi okunamadı. Lütfen ışığı ayarlayıp daha yakından çekmeyi deneyin.');
             } else {
-                setCandidates(lines);
+                setCandidates(uniqueTexts.slice(0, 10)); // Top 10 candidates
                 setProgress(100);
             }
 
