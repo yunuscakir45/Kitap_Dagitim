@@ -113,9 +113,68 @@ const deleteBook = async (req, res) => {
     }
 };
 
+// Toplu kitap ekler
+const createManyBooks = async (req, res) => {
+    try {
+        const { books } = req.body; // Array of { title, author, isbn, coverImage, labelNumber }
+
+        if (!books || !Array.isArray(books)) {
+            return res.status(400).json({ error: 'Geçersiz kitap listesi.' });
+        }
+
+        // Mevcut aktif kitap sayısını al (labelNumber otomatiği için)
+        const activeCount = await prisma.book.count({
+            where: { isActive: true }
+        });
+
+        const createdBooks = [];
+        let skippedCount = 0;
+
+        for (let i = 0; i < books.length; i++) {
+            const b = books[i];
+            
+            // Etiket numarası yoksa otomatik üret
+            let finalLabelNumber = b.labelNumber ? b.labelNumber.toString().trim() : "";
+            if (!finalLabelNumber) {
+                finalLabelNumber = (activeCount + createdBooks.length + 1).toString();
+            }
+
+            // Çakışma kontrolü
+            const exists = await prisma.book.findFirst({
+                where: { labelNumber: finalLabelNumber, isActive: true }
+            });
+
+            if (exists) {
+                skippedCount++;
+                continue;
+            }
+
+            const newBook = await prisma.book.create({
+                data: {
+                    labelNumber: finalLabelNumber,
+                    title: b.title || null,
+                    author: b.author || null,
+                    isbn: b.isbn || null,
+                    coverImage: b.coverImage || null
+                }
+            });
+            createdBooks.push(newBook);
+        }
+
+        res.status(201).json({
+            message: `${createdBooks.length} kitap başarıyla eklendi. ${skippedCount > 0 ? skippedCount + ' kitap çakışma nedeniyle atlandı.' : ''}`,
+            count: createdBooks.length
+        });
+    } catch (error) {
+        console.error('Error creating many books:', error);
+        res.status(500).json({ error: 'Toplu kitap eklenirken bir hata oluştu.' });
+    }
+};
+
 module.exports = {
     getBooks,
     createBook,
     deleteBook,
-    reactivateBook
+    reactivateBook,
+    createManyBooks
 };

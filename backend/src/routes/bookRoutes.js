@@ -8,6 +8,9 @@ router.get('/', bookController.getBooks);
 // POST /api/books -> Yeni kitap ekle
 router.post('/', bookController.createBook);
 
+// POST /api/books/bulk -> Toplu kitap ekle
+router.post('/bulk', bookController.createManyBooks);
+
 // DELETE /api/books/:id -> Kitabı sil (soft delete)
 router.delete('/:id', bookController.deleteBook);
 

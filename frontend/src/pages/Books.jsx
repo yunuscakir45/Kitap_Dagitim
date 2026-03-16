@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { bookApi } from '../api';
 import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon, Camera, RotateCcw, AlertTriangle } from 'lucide-react';
 import BarcodeScanner from '../components/BarcodeScanner';
-import BookOCRScanner from '../components/BookOCRScanner';
+import BookListOCRScanner from '../components/BookListOCRScanner';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const Books = () => {
     const [books, setBooks] = useState([]);
@@ -20,6 +21,8 @@ const Books = () => {
     const [showScanner, setShowScanner] = useState(false);
     const [showBookOCR, setShowBookOCR] = useState(false);
     const [isFetchingFromGoogle, setIsFetchingFromGoogle] = useState(false);
+    const [pendingBooks, setPendingBooks] = useState([]);
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
         fetchBooks();
@@ -66,11 +69,42 @@ const Books = () => {
             
             await fetchBooks();
             setError('');
+            setSuccessMessage('Kitap başarıyla eklendi.');
+            setTimeout(() => setSuccessMessage(''), 3000);
         } catch (err) {
             setError(err.response?.data?.error || 'Kitap eklenemedi.');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleBulkSave = async () => {
+        if (pendingBooks.length === 0) return;
+
+        try {
+            setLoading(true);
+            await bookApi.createMany({ books: pendingBooks });
+            setPendingBooks([]);
+            await fetchBooks();
+            setError('');
+            setSuccessMessage('Toplu kitap ekleme işlemi başarılı.');
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Toplu ekleme sırasında hata oluştu.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updatePendingBook = (index, field, value) => {
+        const newArr = [...pendingBooks];
+        newArr[index][field] = value;
+        setPendingBooks(newArr);
+    };
+
+    const removePendingBook = (index) => {
+        const newArr = pendingBooks.filter((_, i) => i !== index);
+        setPendingBooks(newArr);
     };
     
     const handleReactivate = async (id) => {
@@ -92,9 +126,10 @@ const Books = () => {
         await fetchGoogleBooksData(scannedIsbn);
     };
 
-    const handleBookOCRSuccess = (scannedTitle) => {
-        setTitle(scannedTitle);
+    const handleBookOCRSuccess = (data) => {
+        setPendingBooks(data);
         setShowBookOCR(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const fetchGoogleBooksData = async (queryIsbn) => {
@@ -174,7 +209,89 @@ const Books = () => {
 
             {error && (
                 <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200 text-sm flex items-center shadow-sm">
-                    <span className="font-semibold mr-2">Hata:</span> {error}
+                    <span className="font-semibold mr-2 flex items-center gap-1"><AlertCircle size={16}/> Hata:</span> {error}
+                </div>
+            )}
+
+            {successMessage && (
+                <div className="bg-green-50 text-green-600 p-4 rounded-lg border border-green-200 text-sm flex items-center shadow-sm">
+                    <span className="font-semibold mr-2 flex items-center gap-1"><CheckCircle2 size={16}/> Başarılı:</span> {successMessage}
+                </div>
+            )}
+
+            {/* Pending Books Review UI */}
+            {pendingBooks.length > 0 && (
+                <div className="bg-white dark:bg-slate-800 border-2 border-primary/30 rounded-xl overflow-hidden shadow-sm xl:col-span-3">
+                    <div className="bg-primary/5 p-4 border-b border-primary/10 flex justify-between items-center">
+                        <h3 className="font-semibold text-primary flex items-center gap-2">
+                             📚 Liste Tarandı: Toplu Kayıt Önizleme ({pendingBooks.length} Kitap)
+                        </h3>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setPendingBooks([])} 
+                                className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 transition"
+                            >
+                                Vazgeç
+                            </button>
+                            <button 
+                                onClick={handleBulkSave} 
+                                disabled={loading}
+                                className="px-4 py-1.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition shadow-sm"
+                            >
+                                {loading ? 'Kaydediliyor...' : 'Tümünü Kaydet'}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="overflow-x-auto max-h-[400px]">
+                        <table className="w-full text-sm text-left align-middle border-collapse">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 z-10 border-b border-border">
+                                <tr>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-24">No</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Kitap Adı</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Yazar</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-16 text-center">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {pendingBooks.map((book, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <td className="px-4 py-2">
+                                            <input 
+                                                className="input-field py-1 px-2 h-auto text-[13px]" 
+                                                value={book.labelNumber || ''} 
+                                                placeholder="Oto"
+                                                onChange={(e) => updatePendingBook(idx, 'labelNumber', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <input 
+                                                className="input-field py-1 px-2 h-auto text-[13px]" 
+                                                value={book.title || ''} 
+                                                onChange={(e) => updatePendingBook(idx, 'title', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <input 
+                                                className="input-field py-1 px-2 h-auto text-[13px]" 
+                                                value={book.author || ''} 
+                                                placeholder="Yazar adı (opsiyonel)"
+                                                onChange={(e) => updatePendingBook(idx, 'author', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            <button 
+                                                onClick={() => removePendingBook(idx)} 
+                                                className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -410,7 +527,7 @@ const Books = () => {
 
             {/* OCR Scanner Modal */}
             {showBookOCR && (
-                <BookOCRScanner
+                <BookListOCRScanner
                     onScanComplete={handleBookOCRSuccess}
                     onClose={() => setShowBookOCR(false)}
                 />

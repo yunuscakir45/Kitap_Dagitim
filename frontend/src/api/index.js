@@ -20,6 +20,7 @@ export const studentApi = {
 export const bookApi = {
     getAll: () => api.get('/books'),
     create: (data) => api.post('/books', data),
+    createMany: (data) => api.post('/books/bulk', data),
     delete: (id) => api.delete(`/books/${id}`),
     reactivate: (id) => api.post(`/books/${id}/reactivate`),
 };
