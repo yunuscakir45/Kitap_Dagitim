@@ -45,7 +45,7 @@ const Dashboard = () => {
                 {icon}
             </div>
             <div>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-300">{title}</p>
                 <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{value}</h3>
             </div>
         </div>
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
             <div>
                 <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Hoş Geldiniz</h1>
-                <p className="text-slate-500 text-sm mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
+                <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
             </div>
 
             {loading ? (
@@ -110,13 +110,13 @@ const Dashboard = () => {
                             <h3 className="font-semibold text-lg border-b border-[color:var(--border)] pb-3 mb-4">Son Dağıtım İşlemi</h3>
                             {stats.latestDistribution ? (
                                 <div>
-                                    <p className="text-sm text-slate-500 mb-2">
-                                        Son dağıtım <span className="font-medium text-slate-700 dark:text-slate-300">
+                                    <p className="text-sm text-slate-500 dark:text-slate-300 mb-2">
+                                        Son dağıtım <span className="font-semibold text-slate-700 dark:text-slate-100">
                                             {new Date(stats.latestDistribution.distributedAt).toLocaleDateString('tr-TR')}
                                         </span> tarihinde gerçekleşti.
                                     </p>
-                                    <p className="text-sm text-slate-500 mb-4">
-                                        Toplam <span className="font-bold text-indigo-600">{stats.latestDistribution.items.length}</span> kitap el değiştirdi.
+                                    <p className="text-sm text-slate-500 dark:text-slate-300 mb-4">
+                                        Toplam <span className="font-bold text-indigo-600 dark:text-indigo-400">{stats.latestDistribution.items.length}</span> kitap el değiştirdi.
                                     </p>
                                     <Link to="/history">
                                         <button className="btn-secondary w-full">Tüm Dağıtım Geçmişini Gör</button>

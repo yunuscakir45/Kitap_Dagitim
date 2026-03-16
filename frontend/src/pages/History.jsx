@@ -87,7 +87,7 @@ const History = () => {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">İşlem Geçmişi</h1>
-                    <p className="text-slate-500 text-sm mt-1">Önceki dağıtımları inceleyin veya öğrenci bazlı geçmişe bakın.</p>
+                    <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Önceki dağıtımları inceleyin veya öğrenci bazlı geçmişe bakın.</p>
                 </div>
             </div>
 
@@ -145,7 +145,7 @@ const History = () => {
                                     )}
                                 </div>
                                 {studentHistory.length === 0 ? (
-                                    <p className="text-sm text-slate-500 italic">Henüz okuduğu kitap yok.</p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-300 italic">Henüz okuduğu kitap yok.</p>
                                 ) : (
                                     <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                                         {studentHistory.map(history => (
@@ -155,7 +155,7 @@ const History = () => {
                                                     Kitap #{history.book?.labelNumber || '?'}
                                                     <span className="text-slate-400 font-normal italic ml-1">"{history.book?.title || 'İsimsiz'}"</span>
                                                 </div>
-                                                <div className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                                                <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
                                                     <Calendar size={12} /> {new Date(history.readAt).toLocaleDateString('tr-TR')}
                                                 </div>
                                             </li>
@@ -196,8 +196,8 @@ const History = () => {
                                                         </span>
                                                         {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                                                     </div>
-                                                    <div className="text-sm text-slate-500 mt-1">
-                                                        Not: {dist.note || 'Yok'} • <span className="text-indigo-600 font-medium">{dist.items?.length || 0} Kitap dağıtıldı</span>
+                                                    <div className="text-sm text-slate-500 dark:text-slate-300 mt-1">
+                                                        Not: {dist.note || 'Yok'} • <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{dist.items?.length || 0} Kitap dağıtıldı</span>
                                                     </div>
                                                 </div>
                                                 <button

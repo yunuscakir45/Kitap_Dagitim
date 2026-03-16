@@ -145,12 +145,11 @@ const Students = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Öğrenci Yönetimi</h1>
-                    <p className="text-slate-500 text-sm mt-1">Sınıftaki öğrencileri ekleyin veya çıkarın.</p>
+                        <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Mevcut öğrencileri yönetin ve yeni kayıt oluşturun.</p>
                 </div>
                 <button
                     onClick={handleDownloadClassReport}
                     disabled={loading || students.length === 0}
-                    className="flex items-center gap-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition-colors shadow-sm disabled:opacity-50"
                     title="Tüm sınıfın okuma raporunu PDF olarak indir"
                 >
                     <FileDown size={16} /> Sınıf Raporu İndir

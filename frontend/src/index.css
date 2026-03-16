@@ -18,17 +18,21 @@
 }
 
 .dark {
-  --background: #0f172a;
+  --background: #020617; /* Darker background for better depth */
   --foreground: #f8fafc;
   --primary: #818cf8;
   --primary-foreground: #ffffff;
-  --card: #1e293b;
+  --card: #0f172a; /* Slightly darker card */
   --card-foreground: #f8fafc;
-  --border: #334155;
-  --destructive: #f87171;
+  --border: #1e293b;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --success: #34d399;
-  --success-foreground: #0f172a;
+  --success: #10b981;
+  --success-foreground: #ffffff;
+}
+
+.text-muted-foreground {
+  @apply text-slate-500 dark:text-slate-300;
 }
 
 * {
