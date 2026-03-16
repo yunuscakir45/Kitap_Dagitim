@@ -34,11 +34,14 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
             img.onload = () => {
                 const canvas = canvasRef.current || document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const scale = Math.max(1, Math.min(4, 3000 / Math.max(img.width, img.height)));
+                
+                // Kitap isimleri büyük olduğu için 3000px yerine 1200px yeterli (HIZ İÇİN)
+                const targetSize = 1200;
+                const scale = Math.max(1, targetSize / Math.max(img.width, img.height));
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
+                
                 ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -46,80 +49,20 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                 const width = canvas.width;
                 const height = canvas.height;
 
-                const gray = new Float32Array(width * height);
-                for (let i = 0; i < gray.length; i++) {
-                    const idx = i * 4;
-                    gray[i] = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
-                }
-
-                const blurred = new Float32Array(gray.length);
-                const kernelSize = 3;
-                const halfKernel = Math.floor(kernelSize / 2);
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        let sum = 0;
-                        let count = 0;
-                        for (let ky = -halfKernel; ky <= halfKernel; ky++) {
-                            for (let kx = -halfKernel; kx <= halfKernel; kx++) {
-                                const nx = x + kx;
-                                const ny = y + ky;
-                                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                                    sum += gray[ny * width + nx];
-                                    count++;
-                                }
-                            }
-                        }
-                        blurred[y * width + x] = sum / count;
-                    }
-                }
-
-                const sharpenAmount = 1.5;
-                const sharpened = new Float32Array(gray.length);
-                for (let i = 0; i < gray.length; i++) {
-                    sharpened[i] = Math.min(255, Math.max(0, gray[i] + sharpenAmount * (gray[i] - blurred[i])));
-                }
-
-                const contrast = 60;
+                // Hizli Grayscale ve Kontrast (Tek döngüde)
+                const contrast = 40;
                 const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-                for (let i = 0; i < sharpened.length; i++) {
-                    sharpened[i] = Math.min(255, Math.max(0, factor * (sharpened[i] - 128) + 128));
-                }
-
-                const histogram = new Array(256).fill(0);
-                for (let i = 0; i < sharpened.length; i++) {
-                    histogram[Math.round(sharpened[i])]++;
-                }
-
-                const totalPixels = sharpened.length;
-                let sumTotal = 0;
-                for (let i = 0; i < 256; i++) sumTotal += i * histogram[i];
-
-                let sumB = 0, wB = 0, maxVariance = 0, threshold = 128;
-                for (let i = 0; i < 256; i++) {
-                    wB += histogram[i];
-                    if (wB === 0) continue;
-                    const wF = totalPixels - wB;
-                    if (wF === 0) break;
-                    sumB += i * histogram[i];
-                    const mB = sumB / wB;
-                    const mF = (sumTotal - sumB) / wF;
-                    const variance = wB * wF * (mB - mF) * (mB - mF);
-                    if (variance > maxVariance) {
-                        maxVariance = variance;
-                        threshold = i;
-                    }
-                }
-
-                for (let i = 0; i < sharpened.length; i++) {
-                    const val = sharpened[i] > threshold ? 255 : 0;
-                    const idx = i * 4;
-                    data[idx] = val;
-                    data[idx + 1] = val;
-                    data[idx + 2] = val;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    // Grayscale
+                    const avg = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                    // Contrast
+                    const val = factor * (avg - 128) + 128;
+                    data[i] = data[i+1] = data[i+2] = Math.min(255, Math.max(0, val));
                 }
 
                 ctx.putImageData(imageData, 0, 0);
-                resolve(canvas.toDataURL('image/png'));
+                resolve(canvas.toDataURL('image/png', 0.8)); // 0.8 kalite hizi artirir
             };
             img.src = imageDataUrl;
         });
