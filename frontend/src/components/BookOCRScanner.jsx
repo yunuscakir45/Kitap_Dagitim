@@ -9,6 +9,7 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
     const [progressText, setProgressText] = useState('');
     const [error, setError] = useState('');
     const [rawText, setRawText] = useState('');
+    const [processedImageSrc, setProcessedImageSrc] = useState(null);
     const [showRawText, setShowRawText] = useState(false);
     const [candidates, setCandidates] = useState([]);
     const fileInputRef = useRef(null);
@@ -35,8 +36,8 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                 const canvas = canvasRef.current || document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Kitap isimleri büyük olduğu için 3000px yerine 1200px yeterli (HIZ İÇİN)
-                const targetSize = 1200;
+                // Book covers need a bit more resolution than 1200, let's use 1600 (Balanced)
+                const targetSize = 1600;
                 const scale = Math.max(1, targetSize / Math.max(img.width, img.height));
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
@@ -49,20 +50,52 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                 const width = canvas.width;
                 const height = canvas.height;
 
-                // Hizli Grayscale ve Kontrast (Tek döngüde)
-                const contrast = 40;
-                const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+                // 1. Grayscale conversion using luminance
+                const gray = new Uint8Array(width * height);
+                for (let i = 0; i < gray.length; i++) {
+                    const idx = i * 4;
+                    gray[i] = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+                }
+
+                // 2. Otsu's Binarization (More robust for various backgrounds)
+                const histogram = new Uint32Array(256);
+                for (let i = 0; i < gray.length; i++) histogram[gray[i]]++;
                 
-                for (let i = 0; i < data.length; i += 4) {
-                    // Grayscale
-                    const avg = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                    // Contrast
-                    const val = factor * (avg - 128) + 128;
-                    data[i] = data[i+1] = data[i+2] = Math.min(255, Math.max(0, val));
+                let sum = 0;
+                for (let i = 0; i < 256; i++) sum += i * histogram[i];
+                
+                let sumB = 0, wB = 0, wF = 0, varMax = 0, threshold = 0;
+                const total = gray.length;
+                for (let i = 0; i < 256; i++) {
+                    wB += histogram[i];
+                    if (wB === 0) continue;
+                    wF = total - wB;
+                    if (wF === 0) break;
+                    sumB += i * histogram[i];
+                    const mB = sumB / wB;
+                    const mF = (sum - sumB) / wF;
+                    const varBetween = wB * wF * (mB - mF) * (mB - mF);
+                    if (varBetween > varMax) {
+                        varMax = varBetween;
+                        threshold = i;
+                    }
+                }
+
+                // 3. Apply threshold and check if we need to invert
+                // (Most books are dark text on light background, but some are light on dark)
+                // If the corners are black, it's likely light text on dark background
+                const cornerSum = gray[0] + gray[width-1] + gray[(height-1)*width] + gray[height*width-1];
+                const invert = (cornerSum / 4) < threshold;
+
+                for (let i = 0; i < gray.length; i++) {
+                    let val = gray[i] > threshold ? 255 : 0;
+                    if (invert) val = 255 - val; // Standardize to black text on white
+                    const idx = i * 4;
+                    data[idx] = data[idx+1] = data[idx+2] = val;
                 }
 
                 ctx.putImageData(imageData, 0, 0);
-                resolve(canvas.toDataURL('image/png', 0.8)); // 0.8 kalite hizi artirir
+                resolve(canvas.toDataURL('image/png', 0.9));
             };
             img.src = imageDataUrl;
         });
@@ -87,6 +120,8 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
             setProgress(10);
             setProgressText('Kitap ismi okunuyor...');
 
+            setProcessedImageSrc(processedImage);
+
             const result = await Tesseract.recognize(
                 processedImage,
                 'tur+eng',
@@ -95,7 +130,8 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                         if (m.status === 'recognizing text') {
                             setProgress(10 + Math.floor(m.progress * 85));
                         }
-                    }
+                    },
+                    tessedit_pageseg_mode: '3' // Automatic page segmentation
                 }
             );
 
@@ -176,7 +212,14 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                     <div className="flex flex-col gap-4">
                         <div className="aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center overflow-hidden relative">
                             {imageSrc ? (
-                                <img src={imageSrc} alt="Preview" className="object-contain w-full h-full" />
+                                <div className="relative w-full h-full group">
+                                    <img src={processedImageSrc || imageSrc} alt="Preview" className="object-contain w-full h-full" />
+                                    {processedImageSrc && (
+                                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded">
+                                            OCR Görünümü (Siyah-Beyaz)
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <div className="text-center p-6 flex flex-col items-center gap-2" onClick={() => fileInputRef.current.click()}>
                                     <Upload size={32} className="text-slate-400" />
@@ -220,16 +263,26 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                                 <p className="text-xs text-slate-500">Kitap ismini seçerek formu doldurabilirsiniz.</p>
                             </div>
                         )}
-                    </div>
 
-                    {rawText && (
-                        <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4">
-                            <button onClick={() => setShowRawText(!showRawText)} className="flex items-center gap-2 text-xs text-slate-500">
-                                {showRawText ? <EyeOff size={14} /> : <Eye size={14} />} Ham Metni {showRawText ? 'Gizle' : 'Göster'}
-                            </button>
-                            {showRawText && <pre className="mt-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs overflow-auto max-h-32">{rawText}</pre>}
+                        <div className="bg-amber-50 dark:bg-amber-500/10 p-4 rounded-xl text-[11px] text-amber-800 dark:text-amber-300">
+                            <p className="font-semibold mb-1 uppercase">Daha iyi sonuç için:</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                                <li>Kitabı düz bir zemine koyun ve dik tepeden çekin.</li>
+                                <li>Parmağınızla yazının üstünü kapatmayın.</li>
+                                <li>Parlama yapmaması için ışığı yan taraftan alın.</li>
+                                <li>Siyah-beyaz görünümde yazılar net değilse tekrar çekin.</li>
+                            </ul>
                         </div>
-                    )}
+
+                        {rawText && (
+                            <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                                <button onClick={() => setShowRawText(!showRawText)} className="flex items-center gap-2 text-xs text-slate-500">
+                                    {showRawText ? <EyeOff size={14} /> : <Eye size={14} />} Ham Metni {showRawText ? 'Gizle' : 'Göster'}
+                                </button>
+                                {showRawText && <pre className="mt-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs overflow-auto max-h-32">{rawText}</pre>}
+                            </div>
+                        )}
+                    </div>
                 </div>
                 
                 <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
