@@ -34,6 +34,7 @@ export const distributionApi = {
 
 export const adminApi = {
     resetAll: (data) => api.post('/admin/reset-all', data),
+    resetDistributions: (data) => api.post('/admin/reset-distributions', data),
 };
 
 export const reportApi = {

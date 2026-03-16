@@ -28,4 +28,35 @@ router.post('/reset-all', async (req, res) => {
     }
 });
 
+// POST /api/admin/reset-distributions -> Sadece okuma geçmişini ve dağıtımları temizler
+router.post('/reset-distributions', async (req, res) => {
+    try {
+        const { confirm } = req.body;
+
+        if (confirm !== 'RESET_DISTRIBUTIONS') {
+            return res.status(400).json({ error: 'Dağıtım sıfırlama işlemi için geçerli onay metni gönderilmedi.' });
+        }
+
+        await prisma.$transaction([
+            prisma.readingHistory.deleteMany(),
+            prisma.attendanceSnapshot.deleteMany(),
+            prisma.distributionItem.deleteMany(),
+            prisma.distribution.deleteMany(),
+            prisma.book.updateMany({
+                where: {},
+                data: {
+                    currentHolderStudentId: null,
+                    lostByStudentId: null,
+                    lostAt: null
+                }
+            })
+        ]);
+
+        res.json({ message: 'Tüm dağıtım geçmişi ve okuma kayıtları başarıyla temizlendi, kitaplar kitaplığa döndürüldü.' });
+    } catch (error) {
+        console.error('Error resetting distributions:', error);
+        res.status(500).json({ error: 'Dağıtım geçmişi sıfırlanırken bir hata oluştu.' });
+    }
+});
+
 module.exports = router;
