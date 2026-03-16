@@ -84,7 +84,7 @@ const Distribute = () => {
                         <CheckCircle2 size={32} />
                     </div>
                     <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Dağıtım Başarılı</h2>
-                                    <p className="text-slate-500 dark:text-slate-300 mt-2">Kitaplar belirtilen algoritmaya göre başarıyla dağıtıldı.</p>
+                    <p className="text-muted-foreground mt-2">Kitaplar belirtilen algoritmaya göre başarıyla dağıtıldı.</p>
                 </div>
 
                 <div className="glass-panel p-6">
@@ -129,8 +129,8 @@ const Distribute = () => {
         <div className="max-w-4xl mx-auto space-y-6">
 
             <div>
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Yeni Dağıtım Başlat</h1>
-                <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Önce öğrencilerin bugünkü durumlarını belirleyin.</p>
+                <h1 className="text-2xl font-bold text-foreground">Yeni Dağıtım Başlat</h1>
+                <p className="text-muted-foreground text-sm mt-1">Önce öğrencilerin bugünkü durumlarını belirleyin.</p>
             </div>
 
             {error && (

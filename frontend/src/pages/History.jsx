@@ -86,8 +86,8 @@ const History = () => {
 
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">İşlem Geçmişi</h1>
-                    <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Önceki dağıtımları inceleyin veya öğrenci bazlı geçmişe bakın.</p>
+                    <h1 className="text-2xl font-bold text-foreground">İşlem Geçmişi</h1>
+                    <p className="text-muted-foreground text-sm mt-1">Önceki dağıtımları inceleyin veya öğrenci bazlı geçmişe bakın.</p>
                 </div>
             </div>
 

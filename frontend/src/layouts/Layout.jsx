@@ -21,36 +21,36 @@ const Layout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-[color:var(--background)]">
+        <div className="flex h-screen bg-background text-foreground">
 
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-[color:var(--card)] border-r border-[color:var(--border)] flex flex-col shadow-sm
+                fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col shadow-2xl
                 transform transition-transform duration-300 ease-in-out
                 lg:relative lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                <div className="p-6 flex items-center justify-between border-b border-[color:var(--border)]">
+                <div className="p-6 flex items-center justify-between border-b border-border">
                     <div className="flex items-center gap-3">
-                        <div className="bg-[color:var(--primary)] text-white p-2 rounded-lg">
+                        <div className="bg-primary text-white p-2 rounded-lg shadow-lg">
                             <BookOpen size={24} />
                         </div>
                         <div>
-                            <h1 className="font-bold text-lg leading-tight">Kitap Dağıtım</h1>
-                            <p className="text-xs text-slate-500">Akıllı Sınıf Kütüphanesi</p>
+                            <h1 className="font-bold text-lg leading-tight text-foreground">Kitap Dağıtım</h1>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Akıllı Kütüphane</p>
                         </div>
                     </div>
                     {/* Close button for mobile */}
                     <button
-                        className="lg:hidden p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         onClick={() => setSidebarOpen(false)}
                     >
                         <X size={20} className="text-slate-500" />
@@ -65,18 +65,18 @@ const Layout = () => {
                             onClick={handleNavClick}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                    ? 'bg-[color:var(--primary)] text-white shadow-md shadow-indigo-200 dark:shadow-indigo-900/20'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    ? 'bg-primary text-white shadow-lg shadow-indigo-500/20'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
                                 }`
                             }
                         >
                             {item.icon}
-                            <span className="font-medium">{item.title}</span>
+                            <span className="font-semibold">{item.title}</span>
                         </NavLink>
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-[color:var(--border)] text-xs text-center text-slate-500">
+                <div className="p-4 border-t border-border text-[10px] font-bold text-center text-slate-500 uppercase tracking-widest opacity-50">
                     V1.0.0
                 </div>
             </aside>
@@ -84,7 +84,7 @@ const Layout = () => {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col overflow-hidden min-w-0">
                 {/* Top Header */}
-                <header className="h-16 bg-[color:var(--background)]/80 backdrop-blur-sm border-b border-[color:var(--border)] flex items-center px-4 lg:px-8 z-10 sticky top-0 gap-4">
+                <header className="h-16 bg-card/80 backdrop-blur-md border-b border-border flex items-center px-4 lg:px-8 z-10 sticky top-0 gap-4">
                     {/* Hamburger menu button for mobile */}
                     <button
                         className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -92,13 +92,13 @@ const Layout = () => {
                     >
                         <Menu size={22} className="text-slate-600 dark:text-slate-300" />
                     </button>
-                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200">
+                    <h2 className="text-xl font-bold text-foreground">
                         Yönetim Paneli
                     </h2>
                 </header>
 
                 {/* Dynamic Route Content */}
-                <div className="flex-1 overflow-y-auto p-4 lg:p-8 page-fade-enter-active">
+                <div className="flex-1 overflow-y-auto p-4 lg:p-8">
                     <Outlet />
                 </div>
             </main>

@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
-@import "tailwindcss";
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --radius-xl: 0.75rem;
+}
 
 :root {
   --background: #f8fafc;
@@ -10,66 +19,55 @@
   --card: #ffffff;
   --card-foreground: #0f172a;
   --border: #e2e8f0;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --success: #10b981;
-  --success-foreground: #ffffff;
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: #020617; /* Darker background for better depth */
+  --background: #020617;
   --foreground: #f8fafc;
   --primary: #818cf8;
   --primary-foreground: #ffffff;
-  --card: #0f172a; /* Slightly darker card */
+  --card: #0f172a;
   --card-foreground: #f8fafc;
   --border: #1e293b;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --success: #10b981;
-  --success-foreground: #ffffff;
 }
 
-.text-muted-foreground {
-  @apply text-slate-500 dark:text-slate-300;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen transition-colors duration-300;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
 }
 
-* {
-  border-color: var(--border);
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-  transition: background-color 0.3s, color 0.3s;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-/* Premium micro-animations */
+/* Premium micro-animations & utilities */
 .glass-panel {
-  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl;
+  @apply bg-card border border-border shadow-xl rounded-xl transition-all duration-300;
 }
 
 .btn-primary {
-  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:pointer-events-none disabled:opacity-50 bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 px-4 py-2 shadow-sm;
+  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out bg-primary text-primary-foreground hover:opacity-90 active:scale-95 px-4 py-2 shadow-sm disabled:opacity-50;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 disabled:pointer-events-none disabled:opacity-50 border border-slate-200 dark:border-slate-700 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 px-4 py-2;
+  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out border border-border bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 px-4 py-2;
 }
 
 .btn-destructive {
-  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:pointer-events-none disabled:opacity-50 bg-red-500 text-white hover:bg-red-600 active:scale-95 px-4 py-2 shadow-sm;
+  @apply inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 ease-in-out bg-red-500 text-white hover:bg-red-600 active:scale-95 px-4 py-2 shadow-sm disabled:opacity-50;
 }
 
 .input-field {
-  @apply flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 ease-in-out;
+  @apply flex h-10 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300;
 }
 
-/* Sayfa geçişleri için animasyon */
+.text-muted-foreground {
+  @apply text-slate-500 dark:text-slate-400 font-medium;
+}
+
+/* Page Transitions */
 .page-fade-enter {
   opacity: 0;
   transform: translateY(10px);
@@ -78,16 +76,5 @@ body {
 .page-fade-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.page-fade-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-fade-exit-active {
-  opacity: 0;
-  transform: translateY(-10px);
   transition: opacity 300ms, transform 300ms;
 }

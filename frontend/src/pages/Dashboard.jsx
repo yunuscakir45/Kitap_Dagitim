@@ -45,7 +45,7 @@ const Dashboard = () => {
                 {icon}
             </div>
             <div>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-300">{title}</p>
+                <p className="text-sm text-muted-foreground uppercase tracking-wider text-[10px] font-bold">{title}</p>
                 <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{value}</h3>
             </div>
         </div>
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
             <div>
                 <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Hoş Geldiniz</h1>
-                <p className="text-slate-500 dark:text-slate-300 text-sm mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
+                <p className="text-muted-foreground text-sm mt-1">Sınıf kitaplık dağıtım sistemi genel durumu.</p>
             </div>
 
             {loading ? (
@@ -107,17 +107,21 @@ const Dashboard = () => {
                         </div>
 
                         <div className="glass-panel p-6">
-                            <h3 className="font-semibold text-lg border-b border-[color:var(--border)] pb-3 mb-4">Son Dağıtım İşlemi</h3>
+                            <h3 className="font-bold text-lg border-b border-border pb-3 mb-4 text-foreground">Son Dağıtım İşlemi</h3>
                             {stats.latestDistribution ? (
-                                <div>
-                                    <p className="text-sm text-slate-500 dark:text-slate-300 mb-2">
-                                        Son dağıtım <span className="font-semibold text-slate-700 dark:text-slate-100">
+                                <div className="space-y-4">
+                                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-border">
+                                        <p className="text-sm text-muted-foreground mb-1">Tarih</p>
+                                        <p className="font-bold text-foreground">
                                             {new Date(stats.latestDistribution.distributedAt).toLocaleDateString('tr-TR')}
-                                        </span> tarihinde gerçekleşti.
-                                    </p>
-                                    <p className="text-sm text-slate-500 dark:text-slate-300 mb-4">
-                                        Toplam <span className="font-bold text-indigo-600 dark:text-indigo-400">{stats.latestDistribution.items.length}</span> kitap el değiştirdi.
-                                    </p>
+                                        </p>
+                                    </div>
+                                    <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-border">
+                                        <p className="text-sm text-muted-foreground mb-1">Etki</p>
+                                        <p className="font-bold text-indigo-600 dark:text-indigo-400">
+                                            {stats.latestDistribution.items.length} Kitap el değiştirdi
+                                        </p>
+                                    </div>
                                     <Link to="/history">
                                         <button className="btn-secondary w-full">Tüm Dağıtım Geçmişini Gör</button>
                                     </Link>
