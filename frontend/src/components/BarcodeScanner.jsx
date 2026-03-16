@@ -39,15 +39,20 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
         
         const startScanner = async () => {
             try {
-                // Short delay to ensure browser releases camera from previous attempts
-                await new Promise(r => setTimeout(r, 300));
+                // Short sleep to help Safari stabilize
+                await new Promise(r => setTimeout(r, 500));
+                
+                if (html5QrCode.isScanning) {
+                    await html5QrCode.stop();
+                }
 
                 const config = {
-                    fps: 20,
+                    fps: 15, // Lower FPS for better stability on start
                     qrbox: { width: 250, height: 150 },
                 };
                 
-                // Primary attempt with specific ID
+                // Primary attempt: use specific deviceId if possible
+                // But on some iOS, starting with a constraint object fails while starting with ID string works (or vice-versa)
                 await html5QrCode.start(
                     selectedCameraId,
                     config,
@@ -57,8 +62,23 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                     () => {}
                 );
             } catch (err) {
-                console.warn("First attempt failed", err);
-                setError('Kamera başlatılamadı. Lütfen başka bir kamera seçin veya sayfayı yenileyin.');
+                console.warn("Camera start failed:", err);
+                const errorName = err.name || 'Error';
+                const errorMessage = err.message || 'Unknown';
+                
+                // Fallback attempt: try with generic facingMode instead of ID
+                try {
+                    await html5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 150 } },
+                        (decodedText) => {
+                            html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
+                        },
+                        () => {}
+                    );
+                } catch (fallbackErr) {
+                    setError(`Kamera başlatılamadı (${errorName}: ${errorMessage}). Lütfen tarayıcıda kamera iznini tamamen kapatıp tekrar açmayı deneyin.`);
+                }
             }
         };
 

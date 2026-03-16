@@ -3,7 +3,8 @@ import { bookApi } from '../api';
 import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon, Camera, RotateCcw, AlertTriangle } from 'lucide-react';
 import BarcodeScanner from '../components/BarcodeScanner';
 import BookListOCRScanner from '../components/BookListOCRScanner';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import BookOCRScanner from '../components/BookOCRScanner';
+import { CheckCircle2, AlertCircle, Layers, FileText } from 'lucide-react';
 
 const Books = () => {
     const [books, setBooks] = useState([]);
@@ -19,7 +20,9 @@ const Books = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showScanner, setShowScanner] = useState(false);
-    const [showBookOCR, setShowBookOCR] = useState(false);
+    const [showBookOCR, setShowBookOCR] = useState(false); // Single book
+    const [showBookListOCR, setShowBookListOCR] = useState(false); // Bulk list
+    const [showOCRMenu, setShowOCRMenu] = useState(false);
     const [isFetchingFromGoogle, setIsFetchingFromGoogle] = useState(false);
     const [pendingBooks, setPendingBooks] = useState([]);
     const [successMessage, setSuccessMessage] = useState('');
@@ -313,14 +316,35 @@ const Books = () => {
                                 >
                                     <ScanBarcode size={14} className="text-primary" /> Barkod
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowBookOCR(true)}
-                                    className="flex items-center gap-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground px-3 py-1.5 rounded-lg transition-colors border border-border"
-                                    title="Kitap İsminden Tara (OCR)"
-                                >
-                                    <Camera size={14} className="text-amber-500" /> OCR
-                                </button>
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowOCRMenu(!showOCRMenu)}
+                                        className="flex items-center gap-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground px-3 py-1.5 rounded-lg transition-colors border border-border"
+                                        title="OCR Menüsü"
+                                    >
+                                        <Camera size={14} className="text-amber-500" /> OCR
+                                    </button>
+                                    
+                                    {showOCRMenu && (
+                                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-border rounded-xl shadow-xl z-20 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => { setShowBookOCR(true); setShowOCRMenu(false); }}
+                                                className="w-full text-left p-3 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 border-b border-border"
+                                            >
+                                                <Camera size={14} className="text-orange-500" /> Kitap Kapağı Tara
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setShowBookListOCR(true); setShowOCRMenu(false); }}
+                                                className="w-full text-left p-3 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
+                                            >
+                                                <FileText size={14} className="text-amber-500" /> e-Okul Listesi Tara
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         
@@ -525,11 +549,23 @@ const Books = () => {
                 />
             )}
 
-            {/* OCR Scanner Modal */}
+            {/* OCR Scanner Modal (Single Book) */}
             {showBookOCR && (
-                <BookListOCRScanner
+                <BookOCRScanner
                     onScanComplete={handleBookOCRSuccess}
                     onClose={() => setShowBookOCR(false)}
+                />
+            )}
+
+            {/* Book List OCR Scanner Modal (Bulk) */}
+            {showBookListOCR && (
+                <BookListOCRScanner
+                    onScanComplete={(data) => {
+                        setPendingBooks(data);
+                        setShowBookListOCR(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    onClose={() => setShowBookListOCR(false)}
                 />
             )}
         </div>
