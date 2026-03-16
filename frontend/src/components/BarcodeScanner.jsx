@@ -18,14 +18,14 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                 const devices = await Html5Qrcode.getCameras();
                 if (devices && devices.length) {
                     setCameras(devices);
-                    // Default to last camera (usually rear on mobile)
+                    // Default to last camera (usually rear)
                     setSelectedCameraId(devices[devices.length - 1].id);
                 } else {
-                    setError('Kamera bulunamadı.');
+                    setError('Kamera bulunamadı. Lütfen izinleri kontrol edin.');
                 }
             } catch (err) {
                 console.error("Camera list error:", err);
-                setError('Kamera erişimine izin verilmedi.');
+                setError('Kamera erişimine izin verilmedi veya liste alınamadı.');
             }
         };
         initCameras();
@@ -34,53 +34,31 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
     useEffect(() => {
         if (!selectedCameraId) return;
 
-        const html5QrCode = new Html5Qrcode(qrcodeRegionId);
+        let html5QrCode = new Html5Qrcode(qrcodeRegionId);
         setScannerInstance(html5QrCode);
         
         const startScanner = async () => {
             try {
+                // Short delay to ensure browser releases camera from previous attempts
+                await new Promise(r => setTimeout(r, 300));
+
                 const config = {
                     fps: 20,
                     qrbox: { width: 250, height: 150 },
                 };
                 
-                // Relaxed constraints to avoid OverconstrainedError
-                const videoConstraints = {
-                    deviceId: selectedCameraId,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                };
-
+                // Primary attempt with specific ID
                 await html5QrCode.start(
-                    videoConstraints,
+                    selectedCameraId,
                     config,
                     (decodedText) => {
-                        const audio = new Audio('/success-beep.mp3');
-                        audio.play().catch(() => {});
-                        html5QrCode.stop().then(() => {
-                            onScanSuccess(decodedText);
-                        }).catch(() => {
-                            onScanSuccess(decodedText);
-                        });
+                        html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
                     },
                     () => {}
                 );
             } catch (err) {
-                console.warn("High-res scanner start failed, trying fallback...", err);
-                try {
-                    // Fallback to default device ID start
-                    await html5QrCode.start(
-                        selectedCameraId,
-                        { fps: 10, qrbox: { width: 250, height: 150 } },
-                        (decodedText) => {
-                            html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
-                        },
-                        () => {}
-                    );
-                } catch (fallbackErr) {
-                    console.error("Final scanner start error:", fallbackErr);
-                    setError('Kamera başlatılamadı. Lütfen başka bir kamera seçin veya izinleri kontrol edin.');
-                }
+                console.warn("First attempt failed", err);
+                setError('Kamera başlatılamadı. Lütfen başka bir kamera seçin veya sayfayı yenileyin.');
             }
         };
 
@@ -88,7 +66,7 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
 
         return () => {
             if (html5QrCode.isScanning) {
-                html5QrCode.stop().catch(err => console.error("Cleanup error", err));
+                html5QrCode.stop().catch(err => console.error("Cleanup stop error:", err));
             }
         };
     }, [selectedCameraId, onScanSuccess]);
@@ -98,11 +76,14 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
         if (scannerInstance && scannerInstance.isScanning) {
             scannerInstance.stop().then(() => {
                 setSelectedCameraId(newId);
+                setError('');
             }).catch(() => {
                 setSelectedCameraId(newId);
+                setError('');
             });
         } else {
             setSelectedCameraId(newId);
+            setError('');
         }
     };
 
