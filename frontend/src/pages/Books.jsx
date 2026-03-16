@@ -380,7 +380,7 @@ const Books = () => {
                                                     )}
                                                     <button
                                                         onClick={() => handleDelete(book.id)}
-                                                        className="btn-destructive opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                                                        className="btn-destructive opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity p-2"
                                                         title="Sil"
                                                         disabled={loading}
                                                     >

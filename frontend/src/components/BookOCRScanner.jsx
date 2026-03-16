@@ -107,88 +107,90 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
             return;
         }
 
+        const apiKey = import.meta.env.VITE_GOOGLE_VISION_API_KEY;
+        if (!apiKey) {
+            setError('Google Vision API anahtarı bulunamadı (.env dosyasını kontrol edin).');
+            return;
+        }
+
         try {
             setIsProcessing(true);
             setError('');
             setRawText('');
             setCandidates([]);
-            setProgress(5);
-            setProgressText('Görüntü ön-işleniyor...');
+            setProgress(10);
+            setProgressText('Görüntü hazırlanıyor...');
 
             const processedImage = await preprocessImage(imageSrc);
-
-            setProgress(10);
-            setProgressText('Kitap ismi okunuyor...');
-
             setProcessedImageSrc(processedImage);
+            
+            // Base64 string from data URL
+            const base64Image = processedImage.split(',')[1];
 
-            const result = await Tesseract.recognize(
-                processedImage,
-                'tur+eng',
-                {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            setProgress(10 + Math.floor(m.progress * 85));
-                        }
-                    },
-                    tessedit_pageseg_mode: '3' // Automatic page segmentation
-                }
-            );
+            setProgress(40);
+            setProgressText('Google Vision ile taranıyor...');
 
-            const text = result.data.text;
+            const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    requests: [{
+                        image: { content: base64Image },
+                        features: [{ type: 'DOCUMENT_TEXT_DETECTION' }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error.message || 'Google API Hatası');
+            }
+
+            const fullTextAnnotation = data.responses[0]?.fullTextAnnotation;
+            const text = fullTextAnnotation?.text || "";
             setRawText(text);
 
-            // Analysis based on lines to filter noise and stylized text errors
-            const rawLines = result.data.lines || [];
-            const processedLines = rawLines
-                .map(line => {
-                    const lineText = line.text.trim();
-                    // Basic noise cleaning
-                    const cleaned = lineText
-                        .replace(/[|\\/_~={}[\]<>]/g, '') // Remove common OCR noise symbols
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                    
-                    // Score the line based on confidence and "word-likeness"
-                    const confidence = line.confidence || 0;
-                    const height = line.bbox.y1 - line.bbox.y0;
-                    
-                    // A line is likely a title if it:
-                    // 1. Has reasonable confidence
-                    // 2. Is not too short/long
-                    // 3. Contains letters (not just symbols/numbers)
-                    const hasLetters = /[a-zA-ZçğıiöşüÇĞIİÖŞÜ]/.test(cleaned);
-                    const letterCount = (cleaned.match(/[a-zA-ZçğıiöşüÇĞIİÖŞÜ]/g) || []).length;
-                    const symbolCount = (cleaned.match(/[^a-zA-Z0-9\s]/g) || []).length;
-                    
-                    return {
-                        text: cleaned.toLocaleUpperCase('tr-TR'),
-                        confidence,
-                        height,
-                        isLikely: hasLetters && letterCount > symbolCount && cleaned.length > 2 && cleaned.length < 100
-                    };
-                })
-                .filter(line => line.isLikely && line.confidence > 20) // Filter out pure garbage
-                .sort((a, b) => {
-                    // Sort primarily by height (titles are big), secondarily by confidence
-                    const heightDiff = b.height - a.height;
-                    if (Math.abs(heightDiff) > 10) return heightDiff;
-                    return b.confidence - a.confidence;
-                });
-
-            // Extract unique candidates
-            const uniqueTexts = Array.from(new Set(processedLines.map(l => l.text)));
+            // Google Vision supports "pages" -> "blocks" -> "paragraphs" -> "words"
+            // We'll extract paragraphs as title candidates, sorted by their bounding box size (height)
+            const candidatesList = [];
+            const pages = fullTextAnnotation?.pages || [];
             
-            if (uniqueTexts.length === 0) {
-                setError('Resimden anlamlı bir kitap ismi okunamadı. Lütfen ışığı ayarlayıp daha yakından çekmeyi deneyin.');
+            pages.forEach(page => {
+                page.blocks.forEach(block => {
+                    block.paragraphs.forEach(para => {
+                        const paraText = para.words.map(w => w.symbols.map(s => s.text).join('')).join(' ').trim();
+                        if (paraText.length < 3) return;
+
+                        // Calculate height of the paragraph for prioritizing large text
+                        const vertices = para.boundingBox.vertices;
+                        const height = Math.abs(vertices[2].y - vertices[0].y);
+                        
+                        candidatesList.push({
+                            text: paraText.toLocaleUpperCase('tr-TR'),
+                            height: height || 0
+                        });
+                    });
+                });
+            });
+
+            // Sort by font size (height) and take unique top 10
+            const sorted = candidatesList
+                .sort((a, b) => b.height - a.height)
+                .map(c => c.text);
+            
+            const uniqueCandidates = Array.from(new Set(sorted)).slice(0, 10);
+
+            if (uniqueCandidates.length === 0) {
+                setError('Resimden kitap ismi okunamadı. Google Vision bir metin tespit edemedi.');
             } else {
-                setCandidates(uniqueTexts.slice(0, 10)); // Top 10 candidates
+                setCandidates(uniqueCandidates);
                 setProgress(100);
             }
 
         } catch (err) {
             console.error('OCR Error:', err);
-            setError('OCR işlemi başarısız oldu.');
+            setError(`Tarama başarısız: ${err.message}`);
         } finally {
             setIsProcessing(false);
         }
