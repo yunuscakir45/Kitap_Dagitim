@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { bookApi } from '../api';
+import { BookPlus, Trash2, UserCheck, ScanBarcode, Image as ImageIcon, Camera } from 'lucide-react';
 import BarcodeScanner from '../components/BarcodeScanner';
 import BookOCRScanner from '../components/BookOCRScanner';
-import { Camera } from 'lucide-react';
 
 const Books = () => {
     const [books, setBooks] = useState([]);
