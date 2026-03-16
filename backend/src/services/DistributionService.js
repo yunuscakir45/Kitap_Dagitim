@@ -12,17 +12,23 @@ class DistributionService {
      * @param {string} note - Optional distribution note
      */
     async runDistribution(attendance, note) {
-        // 1. Get all active students with their current books
+        // 1. Get all active students with their current books and read counts
         const allActiveStudents = await prisma.student.findMany({
             where: { isActive: true },
-            include: { currentBooks: true }
+            include: { 
+                currentBooks: true,
+                _count: {
+                    select: { readingHistory: true }
+                }
+            }
         });
 
         // 2. Identify students who will receive books (PRESENT or LOST_BOOK)
+        // Sort by read count descending so most experienced readers get priority in the algorithm
         const receivingStudents = allActiveStudents.filter(s => {
             const attn = attendance.find(a => a.studentId === s.id);
             return attn && (attn.status === 'PRESENT' || attn.status === 'LOST_BOOK');
-        });
+        }).sort((a, b) => (b._count?.readingHistory || 0) - (a._count?.readingHistory || 0));
 
         const noBookStudentIds = attendance
             .filter(a => a.status === 'NO_BOOK')
