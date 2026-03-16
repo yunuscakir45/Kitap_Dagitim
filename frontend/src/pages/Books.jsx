@@ -280,9 +280,9 @@ const Books = () => {
                         <table className="w-full text-sm text-left align-middle border-collapse">
                             <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 z-10 border-b border-border">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-24 text-center">No</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[200px]">Kitap Adı</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[120px]">Yazar</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-20 text-center">No</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[280px]">Kitap Adı</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[150px]">Yazar</th>
                                     <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-16 text-center">İşlem</th>
                                 </tr>
                             </thead>
@@ -299,8 +299,8 @@ const Books = () => {
                                         </td>
                                         <td className="px-4 py-2">
                                             <textarea 
-                                                className="input-field py-1.5 px-2 h-auto text-[13px] min-h-[40px] resize-none leading-tight" 
-                                                rows="1"
+                                                className="input-field py-2 px-2 !h-auto text-[13px] min-h-[60px] resize-y leading-snug" 
+                                                rows="2"
                                                 value={book.title || ''} 
                                                 onChange={(e) => updatePendingBook(idx, 'title', e.target.value)}
                                             />
