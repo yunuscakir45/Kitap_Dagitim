@@ -167,8 +167,8 @@ const Books = () => {
 
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Kitap Yönetimi</h1>
-                    <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Sınıf kütüphanesine kitap ekleyin veya çıkarın.</p>
+                    <h1 className="text-4xl font-black text-foreground tracking-tight">Kitap Yönetimi</h1>
+                    <p className="text-muted-foreground mt-1">Sınıf kütüphanesine kitap ekleyin veya çıkarın.</p>
                 </div>
             </div>
 
@@ -184,32 +184,32 @@ const Books = () => {
                 <div className="md:col-span-1">
                     <div className="glass-panel p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-700 dark:text-slate-200">
-                                <BookPlus size={20} className="text-indigo-500" /> Yeni Kitap
+                            <h3 className="font-semibold text-lg flex items-center gap-2 text-foreground">
+                                <BookPlus size={20} className="text-primary" /> Yeni Kitap
                             </h3>
                             <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setShowScanner(true)}
-                                    className="flex items-center gap-1.5 text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200 dark:border-indigo-500/20"
+                                    className="flex items-center gap-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground px-3 py-1.5 rounded-lg transition-colors border border-border"
                                     title="ISBN Barkodu Tara"
                                 >
-                                    <ScanBarcode size={14} /> Barkod
+                                    <ScanBarcode size={14} className="text-primary" /> Barkod
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowBookOCR(true)}
-                                    className="flex items-center gap-1.5 text-xs font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-300 px-3 py-1.5 rounded-lg transition-colors border border-amber-200 dark:border-amber-500/20"
+                                    className="flex items-center gap-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground px-3 py-1.5 rounded-lg transition-colors border border-border"
                                     title="Kitap İsminden Tara (OCR)"
                                 >
-                                    <Camera size={14} /> OCR
+                                    <Camera size={14} className="text-amber-500" /> OCR
                                 </button>
                             </div>
                         </div>
                         
                         {isFetchingFromGoogle && (
-                            <div className="mb-4 text-sm text-indigo-600 dark:text-indigo-400 animate-pulse flex items-center gap-2">
-                                <div className="w-4 h-4 rounded-full border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent animate-spin"></div>
+                            <div className="mb-4 text-sm text-primary animate-pulse flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
                                 Kitap bilgileri getiriliyor...
                             </div>
                         )}
@@ -219,7 +219,7 @@ const Books = () => {
                             {/* Özet Kapak Fotoğrafı */}
                             {coverImage && (
                                 <div className="flex justify-center mb-2">
-                                    <img src={coverImage} alt="Kapak" className="h-32 object-contain rounded shadow-sm border border-slate-200 dark:border-slate-700" />
+                                    <img src={coverImage} alt="Kapak" className="h-32 object-contain rounded shadow-sm border border-border" />
                                 </div>
                             )}
 
@@ -266,7 +266,7 @@ const Books = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                                <label className="block text-sm font-medium text-muted-foreground mb-1">
                                     Kitap No / Etiket
                                 </label>
                                 <input
@@ -294,18 +294,18 @@ const Books = () => {
                 <div className="md:col-span-2">
                     <div className="glass-panel overflow-hidden">
 
-                        <div className="p-4 border-b border-[color:var(--border)] bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
-                            <h3 className="font-semibold text-slate-700 dark:text-slate-200">Kayıtlı Kitaplar</h3>
-                            <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                        <div className="p-4 border-b border-border bg-muted/50 flex justify-between items-center">
+                            <h3 className="font-semibold text-foreground">Kayıtlı Kitaplar</h3>
+                            <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
                                 {books.length} Kitap
                             </span>
                         </div>
 
                         <div className="max-h-[600px] overflow-y-auto p-0">
                             {books.length === 0 && !loading ? (
-                                <div className="p-8 text-center text-slate-500">Henüz hiç kitap yok.</div>
+                                <div className="p-8 text-center text-muted-foreground">Henüz hiç kitap yok.</div>
                             ) : (
-                                <ul className="divide-y divide-[color:var(--border)]">
+                                <ul className="divide-y divide-border">
                                     {books.map(book => {
                                         const isLost = book.lostAt !== null;
                                         return (
@@ -313,11 +313,11 @@ const Books = () => {
 
                                                 <div className="flex items-center gap-4">
                                                     {/* Kapak Görseli */}
-                                                    <div className={`w-12 h-16 shrink-0 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-600 ${isLost ? 'grayscale opacity-60' : ''}`}>
+                                                    <div className={`w-12 h-16 shrink-0 rounded bg-muted flex items-center justify-center overflow-hidden border border-border ${isLost ? 'grayscale opacity-60' : ''}`}>
                                                         {book.coverImage ? (
                                                             <img src={book.coverImage} alt={book.title || 'Kapak'} className="w-full h-full object-cover" />
                                                         ) : (
-                                                            <ImageIcon size={20} className="text-slate-400" />
+                                                            <ImageIcon size={20} className="text-muted-foreground/40" />
                                                         )}
                                                     </div>
                                                     
@@ -326,7 +326,7 @@ const Books = () => {
                                                             <span className={`text-xs font-bold px-2 py-0.5 rounded ${isLost ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300'}`}>
                                                                 #{book.labelNumber}
                                                             </span>
-                                                            <h4 className={`font-semibold text-slate-800 dark:text-slate-200 line-clamp-1 ${isLost ? 'text-slate-500' : ''}`}>
+                                                            <h4 className={`font-semibold text-foreground line-clamp-1 ${isLost ? 'text-muted-foreground' : ''}`}>
                                                                 {book.title || 'İsimsiz Kitap'}
                                                             </h4>
                                                             {isLost && (
@@ -337,7 +337,7 @@ const Books = () => {
                                                         </div>
                                                         
                                                         {book.author && (
-                                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                                                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                                                                 {book.author}
                                                             </p>
                                                         )}
@@ -354,7 +354,7 @@ const Books = () => {
                                                         ) : (
                                                             <>
                                                                 {book.currentHolder ? (
-                                                                    <p className="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1 mt-1 font-medium">
+                                                                    <p className="text-xs text-primary flex items-center gap-1 mt-1 font-medium">
                                                                         <UserCheck size={12} /> {book.currentHolder.fullName} adlı öğrencide
                                                                     </p>
                                                                 ) : (

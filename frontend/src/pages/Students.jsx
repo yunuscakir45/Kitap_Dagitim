@@ -144,13 +144,14 @@ const Students = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Öğrenci Yönetimi</h1>
-                    <p className="text-slate-600 dark:text-slate-300 font-medium mt-1">Mevcut öğrencileri yönetin ve yeni kayıt oluşturun.</p>
+                    <h1 className="text-4xl font-black text-foreground tracking-tight">Öğrenci Yönetimi</h1>
+                    <p className="text-muted-foreground mt-1">Mevcut öğrencileri yönetin ve yeni kayıt oluşturun.</p>
                 </div>
                 <button
                     onClick={handleDownloadClassReport}
                     disabled={loading || students.length === 0}
                     title="Tüm sınıfın okuma raporunu PDF olarak indir"
+                    className="btn-secondary"
                 >
                     <FileDown size={16} /> Sınıf Raporu İndir
                 </button>
@@ -178,14 +179,14 @@ const Students = () => {
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setPendingStudents([])} 
-                                className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition"
+                                className="btn-secondary py-1.5 px-4"
                             >
                                 İptal
                             </button>
                             <button 
                                 onClick={handleBulkSave} 
                                 disabled={loading}
-                                className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition"
+                                className="btn-primary py-1.5 px-4"
                             >
                                 {loading ? 'Kaydediliyor...' : 'Tümünü Kaydet'}
                             </button>
@@ -194,16 +195,16 @@ const Students = () => {
                     
                     <div className="overflow-x-auto max-h-[400px]">
                         <table className="w-full text-sm text-left align-middle border-collapse">
-                            <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700">
+                            <thead className="bg-muted/50 sticky top-0 z-10 border-b border-border">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-24">Öğrenci No</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Ad Soyad</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-16 text-center">İşlem</th>
+                                    <th className="px-4 py-3 font-semibold text-foreground w-24">Öğrenci No</th>
+                                    <th className="px-4 py-3 font-semibold text-foreground">Ad Soyad</th>
+                                    <th className="px-4 py-3 font-semibold text-foreground w-16 text-center">İşlem</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            <tbody className="divide-y divide-border">
                                 {pendingStudents.map((student, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <tr key={idx} className="hover:bg-muted/30 transition-colors">
                                         <td className="px-4 py-2">
                                             <input 
                                                 className="input-field py-1 px-2 h-auto text-sm" 
@@ -221,7 +222,7 @@ const Students = () => {
                                         <td className="px-4 py-2 text-center">
                                             <button 
                                                 onClick={() => removePendingStudent(idx)} 
-                                                className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+                                                className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-500/10 transition"
                                                 title="Satırı Sil"
                                             >
                                                 <Trash2 size={16} />
@@ -241,8 +242,8 @@ const Students = () => {
                 <div className="md:col-span-1">
                     <div className="glass-panel p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-700 dark:text-slate-200">
-                                <UserPlus size={20} className="text-indigo-500" /> Yeni Öğrenci
+                            <h3 className="font-semibold text-lg flex items-center gap-2 text-foreground">
+                                <UserPlus size={20} className="text-primary" /> Yeni Öğrenci
                             </h3>
                             <button
                                 type="button"
@@ -256,7 +257,7 @@ const Students = () => {
 
                         <form onSubmit={handleAddStudent} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                                <label className="block text-sm font-medium text-muted-foreground mb-1">
                                     Öğrenci No (İsteğe bağlı)
                                 </label>
                                 <input
@@ -270,7 +271,7 @@ const Students = () => {
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                                <label className="block text-sm font-medium text-muted-foreground mb-1">
                                     Ad Soyad
                                 </label>
                                 <input
@@ -297,16 +298,16 @@ const Students = () => {
                 <div className="md:col-span-2">
                     <div className="glass-panel overflow-hidden">
 
-                        <div className="p-4 border-b border-[color:var(--border)] bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
-                            <h3 className="font-semibold text-slate-700 dark:text-slate-200">Kayıtlı Öğrenciler</h3>
-                            <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                        <div className="p-4 border-b border-border bg-muted/50 flex justify-between items-center">
+                            <h3 className="font-semibold text-foreground">Kayıtlı Öğrenciler</h3>
+                            <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
                                 {students.length} Kişi
                             </span>
                         </div>
 
                         <div className="max-h-[500px] overflow-y-auto p-0">
                             {students.length === 0 && !loading ? (
-                                <div className="p-8 text-center text-slate-500">Henüz hiç öğrenci yok.</div>
+                                <div className="p-8 text-center text-muted-foreground">Henüz hiç öğrenci yok.</div>
                             ) : (
                                 <ul className="divide-y divide-[color:var(--border)]">
                                     {students.map(student => (
@@ -321,11 +322,11 @@ const Students = () => {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">
+                                                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
                                                             {student.studentNumber ? `#${student.studentNumber}` : 'No Yok'}
                                                         </span>
                                                         <h4 
-                                                            className="font-medium text-slate-800 dark:text-slate-200 cursor-pointer hover:text-indigo-600 transition-colors"
+                                                            className="font-medium text-foreground cursor-pointer hover:text-primary transition-colors"
                                                             onClick={() => setSelectedStudentId(student.id)}
                                                         >
                                                             {student.fullName}
@@ -334,10 +335,10 @@ const Students = () => {
                                                     
                                                     {student.currentBooks && student.currentBooks.length > 0 && (
                                                         <div className="flex items-center gap-2 mt-1.5">
-                                                            <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700/50 shadow-sm text-[11px] font-medium transition-all group-hover:border-indigo-200 dark:group-hover:border-indigo-900/50">
-                                                                <BookIcon size={12} className="text-indigo-400" />
+                                                            <div className="inline-flex items-center gap-1.5 bg-muted text-muted-foreground px-2.5 py-1 rounded-lg border border-border shadow-sm text-[11px] font-medium transition-all group-hover:border-primary/50">
+                                                                <BookIcon size={12} className="text-primary" />
                                                                 <span className="font-bold opacity-75">No:{student.currentBooks[0].labelNumber}</span>
-                                                                <span className="h-2 w-[1px] bg-slate-300 dark:bg-slate-600"></span>
+                                                                <span className="h-2 w-[1px] bg-border"></span>
                                                                 <span className="italic truncate max-w-[150px] sm:max-w-[250px]">"{student.currentBooks[0].title || 'İsimsiz'}"</span>
                                                             </div>
                                                         </div>

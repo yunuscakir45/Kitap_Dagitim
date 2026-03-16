@@ -7,29 +7,35 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --radius-xl: 0.75rem;
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #020617; /* Stronger dark for light mode */
+  --background: #ffffff;
+  --foreground: #09090b; /* Zinc-950 */
   --primary: #4f46e5;
   --primary-foreground: #ffffff;
   --card: #ffffff;
-  --card-foreground: #020617;
-  --border: #e2e8f0;
+  --card-foreground: #09090b;
+  --muted: #f4f4f5; /* Zinc-100 */
+  --muted-foreground: #71717a; /* Zinc-500 */
+  --border: #e4e4e7; /* Zinc-200 */
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #f8fafc;
-  --primary: #818cf8;
+  --background: #09090b; /* Zinc-950 */
+  --foreground: #fafafa; /* Zinc-50 */
+  --primary: #6366f1;
   --primary-foreground: #ffffff;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --border: #1e293b;
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  --muted: #27272a; /* Zinc-800 */
+  --muted-foreground: #a1a1aa; /* Zinc-400 */
+  --border: #27272a; /* Zinc-800 */
 }
 
 @layer base {
@@ -64,7 +70,7 @@
 }
 
 .text-muted-foreground {
-  @apply text-slate-500 dark:text-slate-400 font-medium;
+  @apply text-muted-foreground;
 }
 
 /* Page Transitions */

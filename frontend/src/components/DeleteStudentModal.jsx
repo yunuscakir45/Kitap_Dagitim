@@ -7,30 +7,30 @@ const DeleteStudentModal = ({ student, loading, onClose, onConfirm }) => {
     const hasBooks = student.currentBooks && student.currentBooks.length > 0;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="glass-panel w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                    <h3 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                        <Trash2 size={18} className="text-red-500" /> Öğrenciyi Sil
+                <div className="p-4 border-b border-border flex justify-between items-center bg-muted/50">
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                        <Trash2 size={18} className="text-destructive" /> Öğrenciyi Sil
                     </h3>
                     <button 
                         onClick={onClose}
-                        className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
+                        className="p-1 hover:bg-muted rounded-full transition-colors"
                     >
-                        <X size={20} />
+                        <X size={20} className="text-muted-foreground" />
                     </button>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 space-y-4">
-                    <p className="text-slate-600 dark:text-slate-400">
-                        <span className="font-bold text-slate-800 dark:text-slate-100">{student.fullName}</span> isimli öğrenciyi silmek istediğinize emin misiniz?
+                    <p className="text-muted-foreground">
+                        <span className="font-bold text-foreground">{student.fullName}</span> isimli student'ı silmek istediğinize emin misiniz?
                     </p>
 
                     {hasBooks ? (
-                        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4 rounded-xl space-y-3">
-                            <div className="flex items-start gap-3 text-amber-800 dark:text-amber-300">
+                        <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl space-y-3">
+                            <div className="flex items-start gap-3 text-amber-500">
                                 <AlertCircle size={20} className="shrink-0 mt-0.5" />
                                 <div>
                                     <p className="font-semibold text-sm">Dikkat: Öğrencinin elinde kitap var!</p>
@@ -40,7 +40,7 @@ const DeleteStudentModal = ({ student, loading, onClose, onConfirm }) => {
                                 </div>
                             </div>
                             
-                            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                            <p className="text-xs text-amber-600 font-medium">
                                 Kitap kütüphaneye teslim edildi mi?
                             </p>
 
@@ -48,25 +48,25 @@ const DeleteStudentModal = ({ student, loading, onClose, onConfirm }) => {
                                 <button
                                     onClick={() => onConfirm(true)}
                                     disabled={loading}
-                                    className="flex items-center justify-between gap-2 w-full p-3 text-sm font-medium bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-500/30 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-400 transition-all group"
+                                    className="flex items-center justify-between gap-2 w-full p-3 text-sm font-medium bg-card border border-border rounded-lg hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-emerald-500 transition-all group shadow-sm"
                                 >
                                     <span className="flex items-center gap-2">
                                         <CheckCircle2 size={16} className="text-emerald-500" />
                                         Evet, teslim etti.
                                     </span>
-                                    <span className="text-[10px] uppercase tracking-wider opacity-60 group-hover:opacity-100">Kitap kütüphaneye döner</span>
+                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground group-hover:text-emerald-500/80">Kitap kütüphaneye döner</span>
                                 </button>
                                 
                                 <button
                                     onClick={() => onConfirm(false)}
                                     disabled={loading}
-                                    className="flex items-center justify-between gap-2 w-full p-3 text-sm font-medium bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-500/30 rounded-lg hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400 transition-all group"
+                                    className="flex items-center justify-between gap-2 w-full p-3 text-sm font-medium bg-card border border-border rounded-lg hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-500 transition-all group shadow-sm"
                                 >
                                     <span className="flex items-center gap-2">
                                         <X size={16} className="text-red-500" />
                                         Hayır, teslim etmedi.
                                     </span>
-                                    <span className="text-[10px] uppercase tracking-wider opacity-60 group-hover:opacity-100">Kitap kaybolmuş sayılır</span>
+                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground group-hover:text-red-500/80">Kitap kaybolmuş sayılır</span>
                                 </button>
                             </div>
                         </div>

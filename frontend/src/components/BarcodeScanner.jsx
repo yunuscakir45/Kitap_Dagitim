@@ -71,17 +71,17 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
     }, [onScanSuccess]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+            <div className="bg-card rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 border border-border glass-panel">
                 
                 {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
-                    <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-100">
+                <div className="flex justify-between items-center p-4 border-b border-border bg-muted/50">
+                    <h3 className="font-semibold text-lg text-foreground">
                         Barkod Tarayıcı
                     </h3>
                     <button 
                         onClick={onClose}
-                        className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
                         title="Kapat"
                     >
                         <X size={20} />
@@ -108,10 +108,10 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                <div className="p-4 border-t border-border bg-muted/50">
                     <button 
                         onClick={onClose}
-                        className="w-full py-2.5 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition-colors"
+                        className="btn-secondary w-full"
                     >
                         İptal 
                     </button>

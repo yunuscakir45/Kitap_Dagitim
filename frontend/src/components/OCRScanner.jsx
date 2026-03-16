@@ -383,27 +383,27 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+            <div className="bg-card rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col border border-border glass-panel">
                 
                 {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
-                    <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-800 dark:text-slate-100">
-                        <FileText size={20} className="text-indigo-500" /> Sınıf Listesi Tarama (OCR)
+                <div className="flex justify-between items-center p-4 border-b border-border bg-muted/50">
+                    <h3 className="font-semibold text-lg flex items-center gap-2 text-foreground">
+                        <FileText size={20} className="text-primary" /> Sınıf Listesi Tarama (OCR)
                     </h3>
                     <button 
                         onClick={onClose}
                         disabled={isProcessing}
-                        className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors disabled:opacity-50"
+                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors disabled:opacity-50"
                     >
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto flex-1">
+                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
                     {error && (
-                        <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm text-center mb-4">
+                        <div className="bg-red-500/10 text-red-500 p-4 rounded-lg text-sm text-center mb-4 border border-red-500/20">
                             {error}
                         </div>
                     )}
@@ -412,7 +412,7 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
                         
                         {/* Image Preview / Upload Area */}
                         <div className="flex-1 flex flex-col gap-4">
-                            <div className="aspect-[3/4] bg-slate-100 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center overflow-hidden relative">
+                            <div className="aspect-[3/4] bg-muted rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
                                 {imageSrc ? (
                                     <>
                                         <img src={imageSrc} alt="Sınıf Listesi" className="object-contain w-full h-full opacity-80" />
@@ -426,14 +426,14 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
                                     </>
                                 ) : (
                                     <div className="text-center p-6 flex flex-col items-center gap-3">
-                                        <Upload size={40} className="text-slate-400" />
+                                        <Upload size={40} className="text-muted-foreground" />
                                         <div>
-                                            <p className="font-medium text-slate-700 dark:text-slate-300">Resim Seçin</p>
-                                            <p className="text-sm text-slate-500 mt-1">Sınıf listesinin fotoğrafını yükleyin (Net olmasına dikkat edin)</p>
+                                            <p className="font-medium text-foreground">Resim Seçin</p>
+                                            <p className="text-sm text-muted-foreground mt-1">Sınıf listesinin fotoğrafını yükleyin (Net olmasına dikkat edin)</p>
                                         </div>
                                         <button 
                                             onClick={() => fileInputRef.current.click()}
-                                            className="mt-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-600 transition"
+                                            className="mt-2 btn-secondary text-sm"
                                         >
                                             Dosya Seç
                                         </button>
@@ -451,8 +451,8 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
 
                         {/* Actions Area */}
                         <div className="w-full md:w-64 flex flex-col justify-center gap-4">
-                            <div className="bg-blue-50 dark:bg-blue-500/10 p-4 rounded-xl text-sm text-blue-800 dark:text-blue-300 mb-4">
-                                <p className="font-semibold mb-1">İpuçları:</p>
+                            <div className="bg-primary/5 p-4 rounded-xl text-sm text-muted-foreground border border-primary/10 mb-4">
+                                <p className="font-semibold mb-1 text-primary">İpuçları:</p>
                                 <ul className="list-disc pl-4 space-y-1">
                                     <li>Belge aydınlık ortamda çekilmeli.</li>
                                     <li>Sıra No, Öğrenci No, Ad ve Soyad sütunları belirgin olmalı.</li>
@@ -462,20 +462,20 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
 
                             {isProcessing ? (
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-sm font-medium text-indigo-700 dark:text-indigo-400">
+                                    <div className="flex justify-between text-sm font-medium text-primary">
                                         <span>{progressText || 'İşleniyor...'}</span>
                                         <span>{progress}%</span>
                                     </div>
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                                    <div className="w-full bg-muted rounded-full h-2.5">
+                                        <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                                     </div>
                                 </div>
                             ) : (
                                 <button
                                     onClick={processImage}
                                     disabled={!imageSrc}
-                                    className={`py-3 px-4 rounded-xl font-medium text-white shadow-sm flex items-center justify-center gap-2 transition-all
-                                        ${imageSrc ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200 dark:shadow-none' : 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed'}`}
+                                    className={`py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all
+                                        ${imageSrc ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
                                 >
                                     <Camera size={18} /> Metni Çıkar (OCR)
                                 </button>
@@ -488,13 +488,13 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
                         <div className="mt-4">
                             <button
                                 onClick={() => setShowRawText(!showRawText)}
-                                className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                                className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 {showRawText ? <EyeOff size={14} /> : <Eye size={14} />}
                                 {showRawText ? 'Ham Metni Gizle' : 'Ham OCR Metnini Göster (Hata Ayıklama)'}
                             </button>
                             {showRawText && (
-                                <pre className="mt-2 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs text-slate-600 dark:text-slate-300 max-h-40 overflow-auto whitespace-pre-wrap font-mono">
+                                <pre className="mt-2 p-3 bg-muted rounded-lg text-xs text-muted-foreground max-h-40 overflow-auto whitespace-pre-wrap font-mono">
                                     {rawText}
                                 </pre>
                             )}
@@ -506,11 +506,11 @@ const OCRScanner = ({ onScanComplete, onClose }) => {
                 <canvas ref={canvasRef} className="hidden" />
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
+                <div className="p-4 border-t border-border bg-muted/50 flex justify-end">
                     <button 
                         onClick={onClose}
                         disabled={isProcessing}
-                        className="py-2.5 px-6 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium transition-colors"
+                        className="btn-secondary px-6"
                     >
                         İptal 
                     </button>

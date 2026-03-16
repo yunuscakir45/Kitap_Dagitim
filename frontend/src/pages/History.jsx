@@ -102,23 +102,23 @@ const History = () => {
                 {/* Öğrenci Okuma Geçmişi */}
                 <div className="lg:col-span-1">
                     <div className="glass-panel p-6 sticky top-24">
-                        <h3 className="font-semibold text-lg flex items-center gap-2 mb-4 text-slate-700 dark:text-slate-200 border-b border-[color:var(--border)] pb-3">
-                            <Search size={18} className="text-indigo-500" /> Öğrenci Ara
+                        <h3 className="font-semibold text-lg flex items-center gap-2 mb-4 text-foreground border-b border-border pb-3">
+                            <Search size={18} className="text-primary" /> Öğrenci Ara
                         </h3>
 
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">
                                 Öğrenci Seçin
                             </label>
                             <select
-                                className="input-field dark:text-slate-200"
+                                className="input-field"
                                 value={selectedStudentId}
                                 onChange={handleStudentSelect}
                                 disabled={loading}
                             >
-                                <option value="" className="dark:bg-slate-900">-- Öğrenci Seç --</option>
+                                <option value="">-- Öğrenci Seç --</option>
                                 {students.map(s => (
-                                    <option key={s.id} value={s.id} className="dark:bg-slate-900">{s.fullName}</option>
+                                    <option key={s.id} value={s.id}>{s.fullName}</option>
                                 ))}
                             </select>
                         </div>
@@ -126,7 +126,7 @@ const History = () => {
                         {studentHistory && (
                             <div className="mt-6">
                                 <div className="flex justify-between items-center mb-3">
-                                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Okuduğu Kitaplar</h4>
+                                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Okuduğu Kitaplar</h4>
                                     {studentHistory.length > 0 && (
                                         <button
                                             onClick={async () => {
@@ -137,7 +137,7 @@ const History = () => {
                                                     setError('Rapor indirilemedi.');
                                                 }
                                             }}
-                                            className="flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-300 px-2.5 py-1.5 rounded-lg transition-colors"
+                                            className="btn-secondary py-1.5 px-2.5 text-xs"
                                             title="PDF olarak indir"
                                         >
                                             <Download size={12} /> PDF
@@ -149,11 +149,11 @@ const History = () => {
                                 ) : (
                                     <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                                         {studentHistory.map(history => (
-                                            <li key={history.id} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-[color:var(--border)]">
-                                                <div className="flex items-center gap-2 font-medium text-slate-800 dark:text-slate-200">
-                                                    <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs">A</span>
+                                            <li key={history.id} className="p-3 bg-muted/30 rounded-lg border border-border">
+                                                <div className="flex items-center gap-2 font-medium text-foreground">
+                                                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">A</span>
                                                     Kitap #{history.book?.labelNumber || '?'}
-                                                    <span className="text-slate-400 font-normal italic ml-1">"{history.book?.title || 'İsimsiz'}"</span>
+                                                    <span className="text-muted-foreground font-normal italic ml-1">"{history.book?.title || 'İsimsiz'}"</span>
                                                 </div>
                                                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
                                                     <Calendar size={12} /> {new Date(history.readAt).toLocaleDateString('tr-TR')}
@@ -170,18 +170,18 @@ const History = () => {
                 {/* Genel Dağıtım Listesi */}
                 <div className="lg:col-span-2">
                     <div className="glass-panel overflow-hidden">
-                        <div className="p-5 border-b border-[color:var(--border)] bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
-                            <h3 className="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                                <HistoryIcon size={18} className="text-indigo-500" /> Tüm Dağıtımlar
+                        <div className="p-5 border-b border-border bg-muted/50 flex justify-between items-center">
+                            <h3 className="font-semibold text-foreground flex items-center gap-2">
+                                <HistoryIcon size={18} className="text-primary" /> Tüm Dağıtımlar
                             </h3>
-                            <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2 py-1 rounded-full">
+                            <span className="text-xs font-semibold bg-muted text-muted-foreground px-2 py-1 rounded-full">
                                 {distributions.length} Kayıt
                             </span>
                         </div>
 
-                        <div className="divide-y divide-[color:var(--border)]">
+                        <div className="divide-y divide-border">
                             {distributions.length === 0 && !loading ? (
-                                <div className="p-8 text-center text-slate-500">Geçmişte yapılmış bir dağıtım yok.</div>
+                                <div className="p-8 text-center text-muted-foreground">Geçmişte yapılmış bir dağıtım yok.</div>
                             ) : (
                                 distributions.map(dist => {
                                     const isExpanded = expandedDistIds.includes(dist.id);
@@ -191,18 +191,18 @@ const History = () => {
                                             <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <div className="cursor-pointer flex-1" onClick={() => toggleExpand(dist.id)}>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                                        <span className="font-semibold text-foreground">
                                                             {new Date(dist.distributedAt).toLocaleString('tr-TR')}
                                                         </span>
-                                                        {isExpanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                                                        {isExpanded ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
                                                     </div>
-                                                    <div className="text-sm text-slate-500 dark:text-slate-300 mt-1">
-                                                        Not: {dist.note || 'Yok'} • <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{dist.items?.length || 0} Kitap dağıtıldı</span>
+                                                    <div className="text-sm text-muted-foreground mt-1">
+                                                        Not: {dist.note || 'Yok'} • <span className="text-primary font-semibold">{dist.items?.length || 0} Kitap dağıtıldı</span>
                                                     </div>
                                                 </div>
                                                 <button
                                                     onClick={() => handleUndo(dist.id)}
-                                                    className="btn-secondary text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/20 flex gap-2 items-center"
+                                                    className="btn-secondary text-red-500 border-red-500/20 hover:bg-red-500/10 flex gap-2 items-center"
                                                     disabled={loading}
                                                     title="Bu dağıtımı geri al"
                                                 >
@@ -212,9 +212,9 @@ const History = () => {
 
                                             {/* Details */}
                                             {isExpanded && (
-                                                <div className="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-[color:var(--border)]">
+                                                <div className="p-4 bg-muted/30 border-t border-border">
                                                     <table className="w-full text-sm text-left">
-                                                        <thead className="text-xs text-slate-500 uppercase bg-slate-100 dark:bg-slate-800">
+                                                        <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                                             <tr>
                                                                 <th className="px-4 py-2 rounded-l-md">Kitap</th>
                                                                 <th className="px-4 py-2">Eski Sahibi</th>
@@ -223,14 +223,14 @@ const History = () => {
                                                         </thead>
                                                         <tbody>
                                                             {dist.items?.map(item => (
-                                                                <tr key={item.id} className="border-b border-[color:var(--border)] last:border-0 hover:bg-slate-100 dark:hover:bg-slate-700/50">
+                                                                <tr key={item.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
                                                                     <td className="px-4 py-2 font-medium">
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-xs text-slate-400">No: {item.book?.labelNumber}</span>
-                                                                            <span className="font-semibold text-slate-700 dark:text-slate-300">"{item.book?.title || 'İsimsiz'}"</span>
+                                                                            <span className="text-xs text-muted-foreground">No: {item.book?.labelNumber}</span>
+                                                                            <span className="font-semibold text-foreground">"{item.book?.title || 'İsimsiz'}"</span>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-4 py-2 text-slate-500">{item.fromStudent?.fullName || <span className="italic text-xs">Yok (Yeni kitap)</span>}</td>
+                                                                    <td className="px-4 py-2 text-muted-foreground">{item.fromStudent?.fullName || <span className="italic text-xs">Yok (Yeni kitap)</span>}</td>
                                                                     <td className="px-4 py-2 font-medium text-emerald-600 dark:text-emerald-400">{item.toStudent?.fullName}</td>
                                                                 </tr>
                                                             ))}

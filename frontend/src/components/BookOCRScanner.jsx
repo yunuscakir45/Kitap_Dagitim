@@ -197,22 +197,22 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 text-slate-800 dark:text-slate-100">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
-                <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 text-foreground">
+            <div className="bg-card rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col border border-border glass-panel">
+                <div className="flex justify-between items-center p-4 border-b border-border bg-muted/50">
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Camera size={20} className="text-indigo-500" /> Kitap Kapağı Tara (OCR)
+                        <Camera size={20} className="text-primary" /> Kitap Kapağı Tara (OCR)
                     </h3>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
-                        <X size={20} />
+                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors">
+                        <X size={20} className="text-muted-foreground" />
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto flex-1">
-                    {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{error}</div>}
+                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+                    {error && <div className="bg-red-500/10 text-red-500 p-3 rounded-lg text-sm mb-4 border border-red-500/20">{error}</div>}
 
                     <div className="flex flex-col gap-4">
-                        <div className="aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center overflow-hidden relative">
+                        <div className="aspect-video bg-muted rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center overflow-hidden relative">
                             {imageSrc ? (
                                 <div className="relative w-full h-full group">
                                     <img src={processedImageSrc || imageSrc} alt="Preview" className="object-contain w-full h-full" />
@@ -223,9 +223,10 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                                     )}
                                 </div>
                             ) : (
-                                <div className="text-center p-6 flex flex-col items-center gap-2" onClick={() => fileInputRef.current.click()}>
-                                    <Upload size={32} className="text-slate-400" />
-                                    <p className="text-sm">Kitap kapağının fotoğrafını çekin veya seçin</p>
+                                <div className="text-center p-6 flex flex-col items-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors w-full h-full" onClick={() => fileInputRef.current.click()}>
+                                    <Upload size={32} className="text-muted-foreground" />
+                                    <p className="text-sm text-foreground font-medium">Kitap kapağının fotoğrafını çekin veya seçin</p>
+                                    <p className="text-xs text-muted-foreground">Yüklemek için tıklayın</p>
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                                 </div>
                             )}
@@ -239,34 +240,34 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
 
                         {isProcessing && (
                             <div className="space-y-2">
-                                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                    <div className="bg-indigo-600 h-2 rounded-full transition-all" style={{ width: `${progress}%` }}></div>
+                                <div className="w-full bg-muted rounded-full h-2">
+                                    <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${progress}%` }}></div>
                                 </div>
-                                <p className="text-center text-xs text-slate-500">{progressText || 'İşleniyor...'}</p>
+                                <p className="text-center text-xs text-muted-foreground">{progressText || 'İşleniyor...'}</p>
                             </div>
                         )}
 
                         {candidates.length > 0 && (
                             <div className="space-y-3">
-                                <p className="text-sm font-semibold flex items-center gap-2 uppercase">
-                                    <Type size={16} className="text-indigo-500" /> Okunan İsimler
+                                <p className="text-sm font-semibold flex items-center gap-2 uppercase text-muted-foreground">
+                                    <Type size={16} className="text-primary" /> Okunan İsimler
                                 </p>
                                 <div className="grid gap-2">
                                     {candidates.map((text, idx) => (
                                         <button
                                             key={idx}
                                             onClick={() => onScanComplete(text)}
-                                            className="text-left p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all text-sm font-medium"
+                                            className="text-left p-3 rounded-lg border border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all text-sm font-medium text-foreground"
                                         >
                                             {text}
                                         </button>
                                     ))}
                                 </div>
-                                <p className="text-xs text-slate-500">Kitap ismini seçerek formu doldurabilirsiniz.</p>
+                                <p className="text-xs text-muted-foreground">Kitap ismini seçerek formu doldurabilirsiniz.</p>
                             </div>
                         )}
 
-                        <div className="bg-amber-50 dark:bg-amber-500/10 p-4 rounded-xl text-[11px] text-amber-800 dark:text-amber-300">
+                        <div className="bg-amber-500/10 p-4 rounded-xl text-[11px] text-amber-500 border border-amber-500/20">
                             <p className="font-semibold mb-1 uppercase">Daha iyi sonuç için:</p>
                             <ul className="list-disc pl-4 space-y-1">
                                 <li>Kitabı düz bir zemine koyun ve dik tepeden çekin.</li>
@@ -277,18 +278,18 @@ const BookOCRScanner = ({ onScanComplete, onClose }) => {
                         </div>
 
                         {rawText && (
-                            <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-4">
-                                <button onClick={() => setShowRawText(!showRawText)} className="flex items-center gap-2 text-xs text-slate-500">
+                            <div className="mt-4 border-t border-border pt-4">
+                                <button onClick={() => setShowRawText(!showRawText)} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
                                     {showRawText ? <EyeOff size={14} /> : <Eye size={14} />} Ham Metni {showRawText ? 'Gizle' : 'Göster'}
                                 </button>
-                                {showRawText && <pre className="mt-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs overflow-auto max-h-32">{rawText}</pre>}
+                                {showRawText && <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-auto max-h-32 text-muted-foreground">{rawText}</pre>}
                             </div>
                         )}
                     </div>
                 </div>
                 
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end">
-                    <button onClick={onClose} className="btn-secondary py-2 px-6">İptal</button>
+                <div className="p-4 border-t border-border bg-muted/50 flex justify-end">
+                    <button onClick={onClose} className="btn-secondary px-6">İptal</button>
                 </div>
             </div>
         </div>

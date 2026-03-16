@@ -45,15 +45,15 @@ const Layout = () => {
                         </div>
                         <div>
                             <h1 className="font-bold text-lg leading-tight text-foreground">Kitap Dağıtım</h1>
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Akıllı Kütüphane</p>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Akıllı Kütüphane</p>
                         </div>
                     </div>
                     {/* Close button for mobile */}
                     <button
-                        className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
                         onClick={() => setSidebarOpen(false)}
                     >
-                        <X size={20} className="text-slate-500" />
+                        <X size={20} className="text-muted-foreground" />
                     </button>
                 </div>
 
@@ -65,8 +65,8 @@ const Layout = () => {
                             onClick={handleNavClick}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                    ? 'bg-primary text-white shadow-lg shadow-indigo-500/20'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                    : 'text-muted-foreground hover:bg-muted'
                                 }`
                             }
                         >
@@ -76,7 +76,7 @@ const Layout = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-border text-[10px] font-bold text-center text-slate-500 uppercase tracking-widest opacity-50">
+                <div className="p-4 border-t border-border text-[10px] font-bold text-center text-muted-foreground uppercase tracking-widest opacity-50">
                     V1.0.0
                 </div>
             </aside>
@@ -87,10 +87,10 @@ const Layout = () => {
                 <header className="h-16 bg-card/80 backdrop-blur-md border-b border-border flex items-center px-4 lg:px-8 z-10 sticky top-0 gap-4">
                     {/* Hamburger menu button for mobile */}
                     <button
-                        className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
                         onClick={() => setSidebarOpen(true)}
                     >
-                        <Menu size={22} className="text-slate-600 dark:text-slate-300" />
+                        <Menu size={22} className="text-muted-foreground" />
                     </button>
                     <h2 className="text-xl font-bold text-foreground">
                         Yönetim Paneli

@@ -43,16 +43,16 @@ const StudentProfileModal = ({ studentId, onClose }) => {
     if (!studentId) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-white/20 dark:border-slate-800 glass-panel">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-sm animate-fade-in">
+            <div className="bg-card w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-border glass-panel">
                 
                 {/* Header */}
-                <div className="relative p-6 sm:p-8 border-b border-[color:var(--border)] bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
+                <div className="relative p-6 sm:p-8 border-b border-border bg-gradient-to-r from-primary/5 to-purple-500/10">
                     <button 
                         onClick={onClose}
-                        className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                        className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors"
                     >
-                        <X size={20} />
+                        <X size={20} className="text-muted-foreground" />
                     </button>
                     
                     <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -60,10 +60,10 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                             <User size={40} />
                         </div>
                         <div className="text-center sm:text-left">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                                 {loading ? 'Yükleniyor...' : student?.fullName}
                             </h2>
-                            <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-2 text-slate-500 dark:text-slate-400 text-sm">
+                            <div className="flex flex-wrap justify-center sm:justify-start gap-4 mt-2 text-muted-foreground text-sm">
                                 <span className="flex items-center gap-1.5"><Hash size={14} /> No: {student?.studentNumber || '-'}</span>
                                 <span className="flex items-center gap-1.5">
                                     <div className={`w-2 h-2 rounded-full ${student?.isActive ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
@@ -77,8 +77,8 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                 <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
-                            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                            <p className="text-slate-500 animate-pulse">Profil verileri hazırlanıyor...</p>
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-muted-foreground animate-pulse">Profil verileri hazırlanıyor...</p>
                         </div>
                     ) : error ? (
                         <div className="text-center py-10">
@@ -104,7 +104,7 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                                     subLabel="Adet"
                                 />
                                 <StatCard 
-                                    icon={<Clock className="text-indigo-500" />} 
+                                    icon={<Clock className="text-primary" />} 
                                     label="İlk Alma" 
                                     value={student.stats.firstLibraryVisit ? new Date(student.stats.firstLibraryVisit).toLocaleDateString('tr-TR') : '-'} 
                                     subLabel="Tarih"
@@ -120,31 +120,31 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Reading History timeline */}
                                 <div className="lg:col-span-2 space-y-4">
-                                    <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-4">
-                                        <History size={20} className="text-indigo-500" /> Okuma Geçmişi
+                                    <h3 className="text-lg font-bold flex items-center gap-2 text-foreground mb-4">
+                                        <History size={20} className="text-primary" /> Okuma Geçmişi
                                     </h3>
                                     
                                     {student.readingHistory.length === 0 ? (
-                                        <div className="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-2xl text-center text-slate-500 border border-dashed border-slate-300 dark:border-slate-700">
+                                        <div className="bg-muted/30 p-8 rounded-2xl text-center text-muted-foreground border border-dashed border-border">
                                             Henüz okuma kaydı bulunmuyor.
                                         </div>
                                     ) : (
-                                        <div className="relative space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:via-purple-500 before:to-transparent">
+                                        <div className="relative space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary before:via-purple-500 before:to-transparent">
                                             {student.readingHistory.map((item, index) => (
                                                 <div key={item.id} className="relative pl-12 group">
-                                                    <div className="absolute left-0 top-1 w-10 h-10 bg-white dark:bg-slate-900 border-4 border-indigo-500 rounded-full flex items-center justify-center z-10 group-hover:scale-110 transition-transform shadow-md">
-                                                        <CheckCircle2 size={16} className="text-indigo-500" />
+                                                    <div className="absolute left-0 top-1 w-10 h-10 bg-card border-4 border-primary rounded-full flex items-center justify-center z-10 group-hover:scale-110 transition-transform shadow-md">
+                                                        <CheckCircle2 size={16} className="text-primary" />
                                                     </div>
-                                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-[color:var(--border)] hover:border-indigo-500/50 transition-colors shadow-sm">
+                                                    <div className="p-4 rounded-2xl bg-muted/30 border border-border hover:border-primary/50 transition-colors shadow-sm">
                                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                                            <div className="font-semibold text-slate-800 dark:text-white">
+                                                            <div className="font-semibold text-foreground">
                                                                 {item.book.title} ({item.book.labelNumber})
                                                             </div>
-                                                            <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-200/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+                                                            <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-lg">
                                                                 {formatDate(item.readAt)}
                                                             </div>
                                                         </div>
-                                                        <div className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                                        <div className="mt-2 text-xs text-primary flex items-center gap-1">
                                                             <ArrowRight size={12} /> {item.distribution?.note || 'Düzenli Dağıtım'}
                                                         </div>
                                                     </div>
@@ -157,7 +157,7 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                                 {/* Sidebar info: Lost Books & Current */}
                                 <div className="space-y-6">
                                     <div>
-                                        <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-4">
+                                        <h3 className="text-lg font-bold flex items-center gap-2 text-foreground mb-4">
                                             <Book size={20} className="text-emerald-500" /> Şu An Elinde
                                         </h3>
                                         {student.currentBooks.length === 0 ? (
@@ -181,7 +181,7 @@ const StudentProfileModal = ({ studentId, onClose }) => {
 
                                     {student.lostBooks.length > 0 && (
                                         <div>
-                                            <h3 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-4">
+                                            <h3 className="text-lg font-bold flex items-center gap-2 text-foreground mb-4">
                                                 <AlertTriangle size={20} className="text-red-500" /> Kaybedilen Kitaplar
                                             </h3>
                                             <div className="space-y-3">
@@ -207,7 +207,7 @@ const StudentProfileModal = ({ studentId, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-[color:var(--border)] bg-slate-50 dark:bg-slate-800/50 flex justify-end">
+                <div className="p-6 border-t border-border bg-muted/50 flex justify-end">
                     <button 
                         onClick={onClose}
                         className="btn-secondary px-8"
@@ -221,16 +221,16 @@ const StudentProfileModal = ({ studentId, onClose }) => {
 };
 
 const StatCard = ({ icon, label, value, subLabel }) => (
-    <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-[color:var(--border)] hover:shadow-md transition-shadow">
+    <div className="bg-muted/30 p-4 rounded-2xl border border-border hover:shadow-md transition-shadow">
         <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white dark:bg-slate-700 rounded-xl shadow-sm">
+            <div className="p-2 bg-card rounded-xl shadow-sm border border-border">
                 {icon}
             </div>
-            <span className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">{label}</span>
+            <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">{label}</span>
         </div>
         <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-slate-800 dark:text-white">{value}</span>
-            <span className="text-xs text-slate-400">{subLabel}</span>
+            <span className="text-2xl font-bold text-foreground">{value}</span>
+            <span className="text-xs text-muted-foreground">{subLabel}</span>
         </div>
     </div>
 );
