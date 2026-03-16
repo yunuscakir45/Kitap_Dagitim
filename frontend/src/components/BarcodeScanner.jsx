@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { X } from 'lucide-react';
 
 const BarcodeScanner = ({ onScanSuccess, onClose }) => {
@@ -8,6 +8,7 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
     const [cameras, setCameras] = useState([]);
     const [selectedCameraId, setSelectedCameraId] = useState('');
     const [scannerInstance, setScannerInstance] = useState(null);
+    const [isScannerReady, setIsScannerReady] = useState(false);
     
     // Config values
     const qrcodeRegionId = "html5qr-code-full-region";
@@ -31,6 +32,8 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
         initCameras();
     }, []);
 
+    const [scanStatus, setScanStatus] = useState('Başlatılıyor...');
+
     useEffect(() => {
         if (!selectedCameraId) return;
 
@@ -39,45 +42,64 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
         
         const startScanner = async () => {
             try {
-                // Short sleep to help Safari stabilize
-                await new Promise(r => setTimeout(r, 500));
+                setScanStatus('Kamera hazırlanıyor...');
+                await new Promise(r => setTimeout(r, 800)); 
                 
                 if (html5QrCode.isScanning) {
                     await html5QrCode.stop();
                 }
 
+                // Configuration with native BarcodeDetector support
                 const config = {
-                    fps: 15, // Lower FPS for better stability on start
-                    qrbox: { width: 250, height: 150 },
+                    fps: 20, 
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        // Responsive qrbox: 80% of width, small height for barcodes
+                        const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                        const boxSize = Math.floor(minEdge * 0.8);
+                        return { width: boxSize, height: Math.floor(boxSize * 0.5) };
+                    },
+                    aspectRatio: 1.0,
+                    // Use BarcodeDetector if supported (very fast on iOS 17+)
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    }
                 };
                 
-                // Primary attempt: use specific deviceId if possible
-                // But on some iOS, starting with a constraint object fails while starting with ID string works (or vice-versa)
+                const videoConstraints = {
+                    deviceId: { exact: selectedCameraId },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                };
+
                 await html5QrCode.start(
-                    selectedCameraId,
+                    videoConstraints,
                     config,
                     (decodedText) => {
                         html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
                     },
-                    () => {}
+                    () => {
+                        setScanStatus('Okunuyor...');
+                    }
                 );
+                setIsScannerReady(true);
             } catch (err) {
-                console.warn("Camera start failed:", err);
-                const errorName = err.name || 'Error';
-                const errorMessage = err.message || 'Unknown';
-                
-                // Fallback attempt: try with generic facingMode instead of ID
+                console.warn("Fallback to basic logic", err);
                 try {
                     await html5QrCode.start(
-                        { facingMode: "environment" },
-                        { fps: 10, qrbox: { width: 250, height: 150 } },
+                        selectedCameraId,
+                        { 
+                            fps: 15, 
+                            qrbox: { width: 250, height: 150 },
+                            experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+                        },
                         (decodedText) => {
                             html5QrCode.stop().then(() => onScanSuccess(decodedText)).catch(() => onScanSuccess(decodedText));
                         },
-                        () => {}
+                        () => { setScanStatus('Okunuyor...'); }
                     );
+                    setIsScannerReady(true);
                 } catch (fallbackErr) {
-                    setError(`Kamera başlatılamadı (${errorName}: ${errorMessage}). Lütfen tarayıcıda kamera iznini tamamen kapatıp tekrar açmayı deneyin.`);
+                    setError(`Kamera başlatılamadı: ${fallbackErr.message}`);
                 }
             }
         };
@@ -85,8 +107,10 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
         startScanner();
 
         return () => {
-            if (html5QrCode.isScanning) {
-                html5QrCode.stop().catch(err => console.error("Cleanup stop error:", err));
+            if (html5QrCode) {
+                if (html5QrCode.isScanning) {
+                    html5QrCode.stop().catch(() => {});
+                }
             }
         };
     }, [selectedCameraId, onScanSuccess]);
@@ -152,7 +176,14 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
                         <div className="relative rounded-xl overflow-hidden bg-black aspect-square shadow-inner border border-border/50">
                             <div id={qrcodeRegionId} className="w-full h-full" />
                             {/* Overlay UI */}
-                            <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
+                            <div className="absolute inset-x-0 bottom-4 flex flex-col items-center gap-2 pointer-events-none">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border ${
+                                    scanStatus === 'Okunuyor...' 
+                                    ? 'bg-primary/20 text-primary border-primary/30 animate-pulse' 
+                                    : 'bg-black/40 text-white/70 border-white/10'
+                                }`}>
+                                    {scanStatus}
+                                </span>
                                 <span className="bg-black/60 text-white text-[10px] sm:text-xs px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20">
                                     Odaklanamazsa kamerayı yavaşça uzaklaştırın
                                 </span>

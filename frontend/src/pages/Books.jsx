@@ -53,8 +53,21 @@ const Books = () => {
     const handleAddBook = async (e) => {
         e.preventDefault();
 
+        setLoading(true);
+
+        // Check for same ISBN or same Title+Author
+        const isDuplicate = isbn 
+            ? books.some(b => b.isbn === isbn)
+            : books.some(b => b.title?.toLowerCase() === title.trim().toLowerCase() && b.author?.toLowerCase() === author.trim().toLowerCase());
+
+        if (isDuplicate) {
+            if (!window.confirm('Bu kitap zaten kütüphanede kayıtlı görünüyor. Yine de eklemek istiyor musunuz?')) {
+                setLoading(false);
+                return;
+            }
+        }
+
         try {
-            setLoading(true);
             await bookApi.create({ 
                 labelNumber,
                 title,
@@ -84,8 +97,25 @@ const Books = () => {
     const handleBulkSave = async () => {
         if (pendingBooks.length === 0) return;
 
+        setLoading(true);
+
+        const duplicates = pendingBooks.filter(pb => {
+            const hasIsbnMatch = pb.isbn && books.some(b => b.isbn === pb.isbn);
+            const hasTitleAuthorMatch = !pb.isbn && books.some(b => 
+                b.title?.toLowerCase() === pb.title?.trim().toLowerCase() && 
+                b.author?.toLowerCase() === pb.author?.trim().toLowerCase()
+            );
+            return hasIsbnMatch || hasTitleAuthorMatch;
+        });
+
+        if (duplicates.length > 0) {
+            if (!window.confirm(`${duplicates.length} adet kitap zaten sistemde kayıtlı görünüyor. Devam etmek istiyor musunuz?`)) {
+                setLoading(false);
+                return;
+            }
+        }
+
         try {
-            setLoading(true);
             await bookApi.createMany({ books: pendingBooks });
             setPendingBooks([]);
             await fetchBooks();
@@ -250,9 +280,9 @@ const Books = () => {
                         <table className="w-full text-sm text-left align-middle border-collapse">
                             <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 z-10 border-b border-border">
                                 <tr>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-24">No</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Kitap Adı</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Yazar</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-24 text-center">No</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[200px]">Kitap Adı</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 min-w-[120px]">Yazar</th>
                                     <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300 w-16 text-center">İşlem</th>
                                 </tr>
                             </thead>
@@ -268,8 +298,9 @@ const Books = () => {
                                             />
                                         </td>
                                         <td className="px-4 py-2">
-                                            <input 
-                                                className="input-field py-1 px-2 h-auto text-[13px]" 
+                                            <textarea 
+                                                className="input-field py-1.5 px-2 h-auto text-[13px] min-h-[40px] resize-none leading-tight" 
+                                                rows="1"
                                                 value={book.title || ''} 
                                                 onChange={(e) => updatePendingBook(idx, 'title', e.target.value)}
                                             />
@@ -467,7 +498,7 @@ const Books = () => {
                                                             <span className={`text-xs font-bold px-2 py-0.5 rounded ${isLost ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300'}`}>
                                                                 #{book.labelNumber}
                                                             </span>
-                                                            <h4 className={`font-semibold text-foreground line-clamp-1 ${isLost ? 'text-muted-foreground' : ''}`}>
+                                                            <h4 className={`font-semibold text-foreground ${isLost ? 'text-muted-foreground' : ''}`}>
                                                                 {book.title || 'İsimsiz Kitap'}
                                                             </h4>
                                                             {isLost && (

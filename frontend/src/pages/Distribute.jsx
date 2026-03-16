@@ -11,6 +11,7 @@ const Distribute = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successResult, setSuccessResult] = useState(null);
+    const [sortBy, setSortBy] = useState('BOOK'); // 'BOOK' or 'STUDENT'
 
     const navigate = useNavigate();
 
@@ -88,10 +89,38 @@ const Distribute = () => {
                 </div>
 
                 <div className="glass-panel p-6">
-                    <h3 className="font-semibold text-lg border-b border-[color:var(--border)] pb-3 mb-4">Yeni Eşleşmeler</h3>
+                    <div className="flex justify-between items-center border-b border-border pb-3 mb-4">
+                        <h3 className="font-semibold text-lg text-foreground">Yeni Eşleşmeler</h3>
+                        <div className="flex bg-muted p-0.5 rounded-lg border border-border text-[11px] font-bold uppercase tracking-tight">
+                            <button 
+                                onClick={() => setSortBy('BOOK')}
+                                className={`px-2.5 py-1 rounded-md transition-all ${sortBy === 'BOOK' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'}`}
+                            >
+                                Kitap No
+                            </button>
+                            <button 
+                                onClick={() => setSortBy('STUDENT')}
+                                className={`px-2.5 py-1 rounded-md transition-all ${sortBy === 'STUDENT' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'}`}
+                            >
+                                Öğrenci
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="space-y-3">
-                        {Object.keys(successResult.matches).map((studentIdStr, index) => {
+                        {Object.keys(successResult.matches)
+                            .sort((a, b) => {
+                                if (sortBy === 'BOOK') {
+                                    const b1 = books.find(book => book.id === successResult.matches[a]);
+                                    const b2 = books.find(book => book.id === successResult.matches[b]);
+                                    return (b1?.labelNumber || '').localeCompare(b2?.labelNumber || '', undefined, { numeric: true, sensitivity: 'base' });
+                                } else {
+                                    const s1 = students.find(s => s.id === parseInt(a));
+                                    const s2 = students.find(s => s.id === parseInt(b));
+                                    return (s1?.fullName || '').localeCompare(s2?.fullName || '');
+                                }
+                            })
+                            .map((studentIdStr, index) => {
                             const bookId = successResult.matches[studentIdStr];
                             const student = students.find(s => s.id === parseInt(studentIdStr));
                             const book = books.find(b => b.id === bookId) || { labelNumber: bookId, title: 'Bilinmeyen Kitap' };
