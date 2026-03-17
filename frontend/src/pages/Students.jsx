@@ -121,7 +121,7 @@ const Students = () => {
     const handleDownloadStudentReport = async (studentId) => {
         try {
             const res = await reportApi.getStudentReport(studentId);
-            generateStudentPdf(res.data);
+            await generateStudentPdf(res.data);
         } catch (err) {
             setError('Rapor oluşturulurken hata oluştu.');
         }
@@ -131,7 +131,7 @@ const Students = () => {
         try {
             setLoading(true);
             const res = await reportApi.getClassReport();
-            generateClassPdf(res.data);
+            await generateClassPdf(res.data);
         } catch (err) {
             setError('Sınıf raporu oluşturulurken hata oluştu.');
         } finally {

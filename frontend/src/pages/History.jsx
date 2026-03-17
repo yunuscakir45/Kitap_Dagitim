@@ -132,7 +132,7 @@ const History = () => {
                                             onClick={async () => {
                                                 try {
                                                     const res = await reportApi.getStudentReport(selectedStudentId);
-                                                    generateStudentPdf(res.data);
+                                                    await generateStudentPdf(res.data);
                                                 } catch (err) {
                                                     setError('Rapor indirilemedi.');
                                                 }
